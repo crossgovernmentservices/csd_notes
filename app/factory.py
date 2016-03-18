@@ -51,7 +51,9 @@ def register_blueprints(app):
     """
     Import and register blueprints
     """
-    pass
+
+    from app.blueprints.base.views import base
+    app.register_blueprint(base)
 
 
 def register_context_processors(app):

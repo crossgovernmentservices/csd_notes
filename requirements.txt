@@ -6,6 +6,7 @@ flask-principal
 flask-script
 flask-security
 flask-sqlalchemy
+flask-testing
 flask-wtf
 libsass
 markdown
