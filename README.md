@@ -23,7 +23,17 @@
 
 ## Tests
 
-`python manage.py test`
+To run fast unit tests:
+
+```
+python manage.py test
+```
+
+To run slow functional tests:
+
+```
+python manage.py functest
+```
 
 
 ## Development
