@@ -1,0 +1,14 @@
+flask
+flask-assets
+flask-login
+flask-mail
+flask-principal
+flask-script
+flask-security
+flask-sqlalchemy
+flask-wtf
+libsass
+markdown
+nose
+raven
+requests
