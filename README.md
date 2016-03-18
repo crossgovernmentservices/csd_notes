@@ -18,9 +18,7 @@
 
 4. `pip install -r requirements.txt`
 
-5. `source environment.sh`
-
-6. `python manage.py runserver`
+5. `python manage.py runserver`
 
 
 ## Tests
@@ -28,7 +26,20 @@
 `python manage.py test`
 
 
+## Development
+
+### Configuration
+
+You may add local overrides to configuration in `app/config/local.py`, which is
+not stored in version control.
+
+
 ## Deployment
 
+### Configuration
+
+The app looks for a Python module named in the `SETTINGS` environment variable.
+For example, to use the included production configuration module, set the
+`SETTINGS` environment variable to `app.config.production`
 
 

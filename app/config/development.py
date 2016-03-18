@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Common configuration settings used by all environments
+Development configuration settings
 """
 
 import os
