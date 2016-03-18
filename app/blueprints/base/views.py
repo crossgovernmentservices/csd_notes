@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Base views, including index page
+"""
+
 from flask import Blueprint, render_template
 
 
