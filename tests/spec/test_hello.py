@@ -1,15 +1,13 @@
 import unittest
 
-from app.factory import create_app
+from tests.util import test_app
 
 
 class TestHello(unittest.TestCase):
 
     def setUp(self):
-        self.app = create_app()
-        self.app.config['TESTING'] = True
-        self.app = self.app.test_client()
+        self.app = test_app()
 
     def test_hello_world(self):
         r = self.app.get('/')
-        assert 'Hello World!' in str(r.data)
+        assert 'Hello World!' in str(r.get_data())

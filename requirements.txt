@@ -10,6 +10,7 @@ flask-security
 flask-sqlalchemy
 flask-testing
 flask-wtf
+ipdb
 libsass
 markdown
 nose
