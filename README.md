@@ -29,10 +29,16 @@ To run fast unit tests:
 python manage.py test
 ```
 
-To run slow functional tests:
+To run smoke tests:
 
 ```
-python manage.py functest
+python manage.py smoketest
+```
+
+To run all tests:
+
+```
+python manage.py all_tests
 ```
 
 
