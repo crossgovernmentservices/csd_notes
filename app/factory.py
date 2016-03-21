@@ -10,9 +10,6 @@ def create_app(config=None):
     App factory function
     """
 
-    if not config:
-        config = os.environ.get('SETTINGS', 'app.config')
-
     app = Flask(__name__)
     app.config.from_object(config)
 
