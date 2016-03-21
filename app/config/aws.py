@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Dictionary-like class for config settings from AWS credstash
+"""
+
 from boto import ec2, utils
 import credstash
 
@@ -15,8 +20,14 @@ class AWSIntanceEnv(object):
         self.env = instance.tags['Environment']
         self.version = instance.tags['ConfigVersion']
 
-    def getSecret(self, name, table="credential-store", context=None,
-                  profile_name=None):
+    def getSecret(self, name, table=None, context=None, profile_name=None):
+        """
+        Low level API for fetching secrets for the current instance
+        """
+
+        if not table:
+            table = '{}-credentials'.format(self.env)
+
         return credstash.getSecret(
             name,
             self.version,
@@ -26,9 +37,17 @@ class AWSIntanceEnv(object):
             profile_name=profile_name)
 
     def __getitem__(self, key):
-        return self.getSecret(key, table='{}-credentials'.format(self.env))
+        """
+        Enable dict-like access
+        """
+
+        return self.getSecret(key)
 
     def get(self, key, default=None):
+        """
+        Return the value, or the default if not found
+        """
+
         try:
             return self.__getitem__(key)
 
