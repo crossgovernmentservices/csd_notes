@@ -1,6 +1,6 @@
 # Civil Service Digital Performance Review Notes App
 
-[![Build Status]()]()
+[![Build Status](https://travis-ci.org/crossgovernmentservices/csd-notes.svg)](https://travis-ci.org/crossgovernmentservices/csd-notes)
 
 
 ## Requirements
