@@ -1,3 +1,5 @@
+boto
+credstash
 flask
 flask-assets
 flask-login

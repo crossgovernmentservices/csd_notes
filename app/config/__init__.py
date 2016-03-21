@@ -6,7 +6,11 @@ Configuration settings
 import os
 
 
+# select source of environment vars
 env = os.environ
+if env.get('SETTINGS') == 'aws':
+    from .aws import AWSIntanceEnv
+    env = AWSIntanceEnv()
 
 
 DEBUG = env.get('DEBUG', True)
