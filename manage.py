@@ -11,13 +11,19 @@ manager = Manager(create_app)
 @manager.command
 def test():
     import nose
-    nose.main(argv=[''])
+    nose.main(argv=['-m', 'tests.spec'])
 
 
 @manager.command
-def functest():
+def smoketest():
     import nose
-    nose.main(argv=['-m', 'tests/functests.py'])
+    nose.main(argv=['-m', 'tests.smoke'])
+
+
+@manager.command
+def all_tests():
+    import nose
+    nose.main(argv=[''])
 
 
 if __name__ == '__main__':
