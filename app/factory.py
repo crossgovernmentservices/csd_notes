@@ -5,7 +5,7 @@ import os
 from flask import Flask, render_template
 
 
-def create_app(config=None):
+def create_app(config='app.config'):
     """
     App factory function
     """
