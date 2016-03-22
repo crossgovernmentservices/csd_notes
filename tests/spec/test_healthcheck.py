@@ -1,18 +1,19 @@
-import json
-import unittest
+from flask import url_for
+import pytest
 
-from tests.util import test_app
+from tests.util import app  # noqa
 
 
-class TestHealthCheck(unittest.TestCase):
+@pytest.fixture
+def response(client):
+    return client.get(url_for('healthcheck.check_health'))
 
-    def setUp(self):
-        self.app = test_app()
-        self.response = self.app.get('/healthcheck.json')
 
-    def test_healthcheck_endpoint_exists(self):
-        self.assertEqual(200, self.response.status_code)
+@pytest.mark.use_fixtures('response')
+class TestWhenBrowsingToHealthcheckEndpoint(object):
 
-    def test_healthcheck_site_status(self):
-        status = json.loads(self.response.get_data(as_text=True))
-        self.assertTrue(status['site'])
+    def test_it_exists(self, response):
+        assert response.status_code == 200
+
+    def test_it_reports_site_ok(self, response):
+        assert response.json['site'] is True

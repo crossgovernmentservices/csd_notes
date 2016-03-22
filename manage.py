@@ -8,22 +8,37 @@ from app.factory import create_app
 manager = Manager(create_app)
 
 
+def run_tests(module=None, *args):
+    import pytest
+    argv = ['-q', '--flakes', '--mccabe', '--pep8', '--spec']
+
+    if module:
+        argv.extend(['--pyargs', module])
+
+    if args:
+        argv.extend(args)
+
+    pytest.main(argv)
+
+
 @manager.command
 def test():
-    import nose
-    nose.main(argv=['-m', 'tests.spec'])
+    run_tests('tests.spec')
 
 
 @manager.command
 def smoketest():
-    import nose
-    nose.main(argv=['-m', 'tests.smoke'])
+    run_tests('tests.smoke', '--start-live-server')
 
 
 @manager.command
 def all_tests():
-    import nose
-    nose.main(argv=[''])
+    run_tests()
+
+
+@manager.command
+def coverage():
+    run_tests('tests.spec', '--cov=app', '--cov-report=html')
 
 
 if __name__ == '__main__':

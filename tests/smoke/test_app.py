@@ -1,20 +1,13 @@
-from flask_testing import LiveServerTestCase
-import random
+from flask import url_for
+import pytest
 import requests
 
-from app.factory import create_app
+from tests.util import app  # noqa
 
 
-class TestApplication(LiveServerTestCase):
+@pytest.mark.use_fixtures('live_server')
+class TestApplication(object):
 
-    def create_app(self):
-        app = create_app()
-        app.config['TESTING'] = True
-        # XXX - may result in "OSError: [Errno 48] Address already in use"
-        #       if the same port number is used in quick succession
-        app.config['LIVESERVER_PORT'] = random.randint(8000, 8999)
-        return app
-
-    def test_app_ready(self):
-        r = requests.get(self.get_server_url())
-        self.assertEqual(200, r.status_code)
+    def test_app_ready(self, live_server):
+        r = requests.get(url_for('base.index', _external=True))
+        assert 200 == r.status_code
