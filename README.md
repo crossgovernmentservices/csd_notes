@@ -24,21 +24,23 @@
 ## Tests
 
 To run fast unit tests:
-
 ```
 python manage.py test
 ```
 
 To run smoke tests:
-
 ```
 python manage.py smoketest
 ```
 
 To run all tests:
-
 ```
 python manage.py all_tests
+```
+
+To generate HTML coverage reports (in the `htmlcov` directory)
+```
+python manage.py coverage
 ```
 
 
