@@ -46,6 +46,20 @@ python manage.py coverage
 
 ## Development
 
+### Requirements
+
+If you depend on Python modules that are not needed in production (eg: ipython),
+you may use a `local_requirements.txt` file which is not stored in version
+control. Set the first line of this file to
+```
+-r requirements.txt
+```
+to add all the production dependencies. That way, you will only need to run
+```
+pip install -r local_requirements.txt
+```
+to install all requirements.
+
 ### Configuration
 
 You may add local overrides to configuration in `app/config/local.py`, which is
