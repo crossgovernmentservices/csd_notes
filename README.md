@@ -60,18 +60,12 @@ pip install -r local_requirements.txt
 ```
 to install all requirements.
 
-### Configuration
-
-You may add local overrides to configuration in `app/config/local.py`, which is
-not stored in version control.
-
 
 ## Deployment
 
 ### Configuration
 
-The app looks for a Python module named in the `SETTINGS` environment variable.
-For example, to use the included production configuration module, set the
-`SETTINGS` environment variable to `app.config.production`
-
-
+The app looks for a `SETTINGS` environment variable on start up.  To retrieve
+configuration values from AWS DynamoDB using credstash, set the `SETTINGS`
+environment variable to `AWS`.  Otherwise, the default configuration is used,
+which fetches values from the environment.

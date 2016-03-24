@@ -5,13 +5,13 @@ import os
 from flask import Flask, render_template
 
 
-def create_app(config='app.config'):
+def create_app():
     """
     App factory function
     """
 
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_pyfile('config.py')
 
     register_error_handlers(app)
     register_blueprints(app)
