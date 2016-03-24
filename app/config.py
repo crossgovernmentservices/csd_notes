@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Application configuration
+"""
+
 import os
 
 
+# get settings from environment, or credstash if running in AWS
 env = os.environ
 if env.get('SETTINGS') == 'AWS':
     from lib.aws_env import env

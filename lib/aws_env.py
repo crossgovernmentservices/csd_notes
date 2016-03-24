@@ -15,7 +15,7 @@ class AWSInstanceEnv(object):
         self._table = None
         self._version = None
 
-    def initialize(self):
+    def _initialize(self):
         metadata = utils.get_instance_metadata(timeout=5, num_retries=1)
         instance_id = metadata['instance-id']
 
@@ -36,7 +36,7 @@ class AWSInstanceEnv(object):
         """
 
         if not self._initialized:
-            self.initialize()
+            self._initialize()
 
         return credstash.getSecret(
             key,
