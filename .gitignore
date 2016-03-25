@@ -64,3 +64,13 @@ target/
 # local config
 config/local.py
 local_requirements.txt
+
+# cache
+.webassets-cache
+
+# generated files
+app/static/govuk_elements/
+app/static/govuk_frontend_toolkit/
+app/static/govuk_template/
+app/templates/govuk_template/
+app/static/stylesheets/

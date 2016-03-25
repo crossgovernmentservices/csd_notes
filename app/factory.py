@@ -62,7 +62,9 @@ def register_context_processors(app):
     """
 
     def base_context_processor():
-        return {}
+        return {
+            'asset_path': '/static/govuk_template/assets/',
+        }
 
     app.context_processor(base_context_processor)
 
@@ -71,4 +73,6 @@ def register_extensions(app):
     """
     Import and register flask extensions and initialize with app object
     """
-    pass
+
+    from app.assets import env
+    env.init_app(app)
