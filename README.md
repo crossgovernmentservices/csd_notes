@@ -6,6 +6,7 @@
 ## Requirements
 
 - Python 3
+- Ruby 2.2.0 (for `govuk_template`)
 
 
 ## Quickstart
@@ -18,7 +19,9 @@
 
 4. `pip install -r requirements.txt`
 
-5. `python manage.py runserver`
+5. `python manage.py install_all_govuk_assets`
+
+6. `python manage.py runserver`
 
 
 ## Tests
