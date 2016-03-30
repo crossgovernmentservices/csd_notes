@@ -5,13 +5,14 @@ import os
 from flask import Flask, render_template
 
 
-def create_app():
+def create_app(config='config.py', **kwargs):
     """
     App factory function
     """
 
     app = Flask(__name__)
-    app.config.from_pyfile('config.py')
+    app.config.from_pyfile(config)
+    app.config.update(kwargs)
 
     register_error_handlers(app)
     register_blueprints(app)
@@ -76,3 +77,13 @@ def register_extensions(app):
 
     from app.assets import env
     env.init_app(app)
+
+    from app.extensions import db
+    db.init_app(app)
+    # XXX avoids "RuntimeError: application not registered on db instance and
+    # no application bound to current context" when accessing db outside of app
+    # context
+    db.app = app
+
+    from flask.ext.migrate import Migrate
+    Migrate().init_app(app, db)

@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 import urllib
 import zipfile
 
+from flask.ext.migrate import MigrateCommand
 from flask.ext.script import Manager
 import pytest
 
@@ -15,6 +16,7 @@ from app.factory import create_app
 
 
 manager = Manager(create_app)
+manager.add_command('db', MigrateCommand)
 
 
 def run_tests(module=None, *args):
