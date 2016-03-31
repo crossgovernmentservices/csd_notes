@@ -56,6 +56,9 @@ def register_blueprints(app):
     from app.blueprints.healthcheck.views import healthcheck
     app.register_blueprint(healthcheck)
 
+    from app.blueprints.notes.views import notes
+    app.register_blueprint(notes)
+
 
 def register_context_processors(app):
     """
