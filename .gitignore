@@ -61,9 +61,10 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-# local config
+# local development files
 config/local.py
 local_requirements.txt
+development.db
 
 # cache
 .webassets-cache

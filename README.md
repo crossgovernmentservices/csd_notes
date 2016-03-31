@@ -21,7 +21,9 @@
 
 5. `python manage.py install_all_govuk_assets`
 
-6. `python manage.py runserver`
+6. `python manage.py db upgrade`
+
+7. `python manage.py runserver`
 
 
 ## Tests

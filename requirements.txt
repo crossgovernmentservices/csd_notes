@@ -4,6 +4,7 @@ flask
 flask-assets
 flask-login
 flask-mail
+flask-migrate
 flask-principal
 flask-script
 flask-security
