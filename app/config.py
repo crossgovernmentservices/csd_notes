@@ -17,6 +17,8 @@ ASSETS_DEBUG = False
 
 DEBUG = bool(env.get('DEBUG', True))
 
+HUMANIZE_USE_UTC = True
+
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
 SESSION_COOKIE_SECURE = False

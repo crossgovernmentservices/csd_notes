@@ -17,7 +17,7 @@
         <button class="button">Save</button>
       </form>
     </section>
-    <span class="note-date" itemprop="dateModified" data-timestamp="{{ note.updated.timestamp() }}">
+    <span class="note-date" itemprop="dateModified" data-timestamp="{{ note.updated.strftime('%Y%m%d%H%M%S.%f') }}">
       {{ note.updated|humanize() }}
     </span>
     <span class="undo-link">Just updated (<a href="">undo</a>)</span>
@@ -46,7 +46,7 @@
     #}
   </div>
 
-  <form action="" class="form note-form add-note-form">
+  <form action="{{ url_for('notes.add') }}" method="post" class="form note-form add-note-form">
     <textarea name="content" rows="1" placeholder="Write a note &hellip;"></textarea>
     <button class="button">Save</button>
   </form>
