@@ -1,1 +1,6 @@
-/* nothing yet */
+@import "../govuk_elements/public/sass/main.scss";
+
+@import "internal_interface/app-typography.scss";
+@import "internal_interface/browse-pane.scss";
+
+@import "notes/notes.scss";

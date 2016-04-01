@@ -13,7 +13,9 @@ if env.get('SETTINGS') == 'AWS':
     from lib.aws_env import env
 
 
-DEBUG = env.get('DEBUG', True)
+ASSETS_DEBUG = False
+
+DEBUG = bool(env.get('DEBUG', True))
 
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
@@ -25,8 +27,8 @@ SQLALCHEMY_DATABASE_URI = env.get(
     'DATABASE_URI',
     'sqlite:///{}'.format(SQLALCHEMY_DATABASE_PATH))
 
-SQLALCHEMY_TRACK_MODIFICATIONS = env.get(
+SQLALCHEMY_TRACK_MODIFICATIONS = bool(env.get(
     'SQLALCHEMY_TRACK_MODIFICATIONS',
-    False)
+    False))
 
 TESTING = bool(env.get('TESTING', False))

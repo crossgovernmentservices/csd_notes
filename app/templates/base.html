@@ -1,0 +1,37 @@
+{% extends "govuk_template/views/layouts/govuk_template.html" %}
+
+{% block head %}
+
+  {% assets "css_govuk_elements", "css_main" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+
+  <script src="/static/js/vendor/jquery/jquery.min.js"></script>
+
+  {% block endhead %}{% endblock %}
+
+{% endblock %}
+
+{% block content %}
+  <main id="wrapper" role="main">
+    <div id="content">
+      <div class="inner-block">
+        <div class="phase-banner-alpha">
+          <p>
+            <strong class="phase-tag">ALPHA</strong>
+            <span>This is a prototype service</span>
+          </p>
+        </div>
+      </div>
+
+      {% block body_content %}{% endblock %}
+
+      <div class="report-a-problem-toggle-wrapper js-footer feedback-footer">
+        <p class="report-a-problem-toggle">
+          <a href="" class="js-report-a-problem-toggle">Is there anything wrong with this page?</a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+{% endblock %}

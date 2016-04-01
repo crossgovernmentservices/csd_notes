@@ -6,7 +6,7 @@ import pytest
 from app.factory import create_app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def app(request):
     test_db = os.path.join(os.path.dirname(__file__), '../test.db')
     test_db_uri = 'sqlite:///{}'.format(test_db)
@@ -25,7 +25,7 @@ def app(request):
     return app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def db(app, request):
 
     def remove_db():
@@ -40,3 +40,23 @@ def db(app, request):
     request.addfinalizer(remove_db)
 
     return app.extensions['sqlalchemy'].db
+
+
+@pytest.fixture(scope='function')
+def db_session(db, request):
+    connection = db.engine.connect()
+    transaction = connection.begin()
+
+    options = {'bind': connection, 'binds': {}}
+    session = db.create_scoped_session(options=options)
+
+    db.session = session
+
+    def teardown():
+        transaction.rollback()
+        connection.close()
+        session.remove()
+
+    request.addfinalizer(teardown)
+
+    return session

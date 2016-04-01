@@ -14,10 +14,11 @@ def create_app(config='config.py', **kwargs):
     app.config.from_pyfile(config)
     app.config.update(kwargs)
 
-    register_error_handlers(app)
     register_blueprints(app)
     register_context_processors(app)
+    register_error_handlers(app)
     register_extensions(app)
+    register_filters(app)
 
     return app
 
@@ -28,9 +29,9 @@ def register_error_handlers(app):
     """
 
     error_handlers = {
-        '404.jinja': [404],
-        '4xx.jinja': [401, 402, 405, 406, 407, 408, 409],
-        '5xx.jinja': [500, 501, 502, 503, 504, 505]}
+        '404.html': [404],
+        '4xx.html': [401, 402, 405, 406, 407, 408, 409],
+        '5xx.html': [500, 501, 502, 503, 504, 505]}
 
     def make_handler(code, template):
         template = os.path.join('errors', template)
@@ -67,7 +68,7 @@ def register_context_processors(app):
 
     def base_context_processor():
         return {
-            'asset_path': '/static/govuk_template/assets/',
+            'asset_path': '/static/govuk_template/assets/'
         }
 
     app.context_processor(base_context_processor)
@@ -90,3 +91,23 @@ def register_extensions(app):
 
     from flask.ext.migrate import Migrate
     Migrate().init_app(app, db)
+
+    from flaskext.markdown import Markdown
+    Markdown(app)
+
+    from flask.ext.humanize import Humanize
+    Humanize(app)
+
+
+def register_filters(app):
+    """
+    Import and register Jinja filters
+    """
+
+    from html5lib_truncation import truncate_html
+    from markupsafe import Markup
+
+    def truncate(*args, **kwargs):
+        return Markup(truncate_html(*args, **kwargs))
+
+    app.jinja_env.filters['truncate_html'] = truncate
