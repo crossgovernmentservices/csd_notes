@@ -16,8 +16,8 @@ def static(*path):
 
 libsass_output = LibSass(include_paths=[
     static('sass'),
-    static('govuk_frontend_toolkit', 'stylesheets'),
-    static('govuk_elements', 'public', 'sass', 'elements')])
+    static('govuk_frontend_toolkit/stylesheets'),
+    static('govuk_elements/public/sass/elements')])
 
 env = Environment()
 

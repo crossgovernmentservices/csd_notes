@@ -1,8 +1,6 @@
 from flask import url_for
 import pytest
 
-from tests.util import app  # noqa
-
 
 @pytest.fixture
 def response(client):

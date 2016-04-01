@@ -2,8 +2,6 @@ from flask import url_for
 import pytest
 import requests
 
-from tests.util import app  # noqa
-
 
 @pytest.mark.use_fixtures('live_server')
 class TestApplication(object):

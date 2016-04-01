@@ -29,6 +29,7 @@ class Note(db.Model):
         note = Note()
         note.content = content
         note.created = datetime.datetime.utcnow()
+        note.updated = note.created
         note.is_email = is_email
         db.session.add(note)
         db.session.commit()

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block endhead %}
+  {% assets "css_notes" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+{% endblock %}
+
+{% macro note_element(note) %}
+  <li class="note" itemscope itemtype="http://schema.org/CreativeWork">
+    <section class="text rendered-markdown rendered-note" itemprop="text">
+      {{ note.content|markdown|truncate_html(250, end=" \u2026") }}
+    </section>
+    <section>
+      <form action="" class="form note-form">
+        <textarea name="content" id="content" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
+        <button class="button">Save</button>
+      </form>
+    </section>
+    <span class="note-date" itemprop="dateModified" data-timestamp="{{ note.updated.timestamp() }}">
+      {{ note.updated|humanize() }}
+    </span>
+    <span class="undo-link">Just updated (<a href="">undo</a>)</span>
+    {% if note.is_email %}
+    <div class="email-flag">Email</div>
+    {% endif %}
+  </li>
+{% endmacro %}
+
+{% block body_content %}
+
+  <div class="sign-out"></div>
+
+  <div class="test">
+    <h1 class="heading-large">Notes</h1>
+
+    {#
+    <div class="message-box">
+      <h3 class="heading-small">You can also email notes in to the service</h3>
+      <p>
+        Use <a href="">{{ current_user.inbox_email }}</a>.
+        Check your settings for more details.
+      </p>
+      <span class="dismiss">Dismiss</span>
+    </div>
+    #}
+  </div>
+
+  <form action="" class="form note-form add-note-form">
+    <textarea name="content" rows="1" placeholder="Write a note &hellip;"></textarea>
+    <button class="button">Save</button>
+  </form>
+
+  <ul class="notes-list">
+  {% for note in notes %}
+    {{ note_element(note) }}
+  {% endfor %}
+  </ul>
+
+  <div class="test">
+    <a class="more-link" href="">load more</a>
+  </div>
+
+{% endblock %}
+
+{% block body_end %}
+<script src="/static/js/notesapp.js"></script>
+{% endblock %}

@@ -11,4 +11,4 @@ base = Blueprint('base', __name__)
 
 @base.route('/')
 def index():
-    return render_template('index.jinja')
+    return render_template('index.html')
