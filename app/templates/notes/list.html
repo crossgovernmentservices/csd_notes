@@ -34,16 +34,17 @@
   <div class="test">
     <h1 class="heading-large">Notes</h1>
 
-    {#
+    {% if show_tip %}
     <div class="message-box">
       <h3 class="heading-small">You can also email notes in to the service</h3>
       <p>
-        Use <a href="">{{ current_user.inbox_email }}</a>.
+        Use <a href="mailto:{{ inbox_email }}">{{ inbox_email }}</a>.
         Check your settings for more details.
       </p>
-      <span class="dismiss">Dismiss</span>
+      <span class="dismiss"><a href="{{ url_for('notes.dismiss_tip') }}">Dismiss</a></span>
     </div>
-    #}
+    {% endif %}
+
   </div>
 
   <form action="{{ url_for('notes.add') }}" method="post" class="form note-form add-note-form">

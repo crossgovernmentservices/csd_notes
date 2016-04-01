@@ -1,3 +1,6 @@
+import datetime
+from http.cookies import SimpleCookie
+
 from bs4 import BeautifulSoup
 from flask import url_for
 from markupsafe import Markup
@@ -23,7 +26,34 @@ def soup(response):
     return BeautifulSoup(response.get_data(as_text=True), 'html.parser')
 
 
-@pytest.mark.use_fixtures('soup')
+@pytest.fixture
+def seen_twice_already(client):
+    cookie = SimpleCookie()
+    cookie['seen_email_tip'] = 2
+    expires = datetime.datetime.now() + datetime.timedelta(days=1)
+    expires = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
+    print('expires', expires)
+    cookie['seen_email_tip']['expires'] = expires
+    cookie['seen_email_tip']['domain'] = 'localhost'
+    cookie['seen_email_tip']['path'] = '/'
+
+    return client.get(url_for('notes.list'), headers={
+        'Cookie': cookie.output(header='')})
+
+
+@pytest.fixture
+def seen_twice_already_soup(seen_twice_already):
+    return BeautifulSoup(
+        seen_twice_already.get_data(as_text=True),
+        'html.parser')
+
+
+@pytest.fixture
+def dismiss_tip(client):
+    return client.get(url_for('notes.dismiss_tip'))
+
+
+@pytest.mark.use_fixtures('seen_twice_already', 'soup')
 class TestWhenViewingNotesListPage(object):
 
     def test_it_lists_notes_in_reverse_chronological_order(self, soup):
@@ -44,3 +74,28 @@ class TestWhenViewingNotesListPage(object):
         notes = soup.find_all(class_='note')
         for note in notes:
             assert len(Markup(note.find(itemprop='text')).striptags()) <= 250
+
+    def test_it_shows_the_email_tip(self, soup):
+        tip = soup.find(class_='message-box')
+        assert tip.find('a')['href'].startswith('mailto:')
+
+    def test_it_sets_a_cookie_if_it_has_been_seen_twice_already(
+            self, seen_twice_already):
+        cookies = SimpleCookie()
+        cookies.load(seen_twice_already.headers.get('Set-Cookie'))
+        assert 'seen_email_tip' in cookies
+        assert int(cookies['seen_email_tip'].value) == 2
+
+    def test_it_hides_the_email_tip_if_it_has_been_seen_twice_already(
+            self, seen_twice_already_soup):
+        tip = seen_twice_already_soup.find(class_='message-box')
+        assert tip is None
+
+
+class TestWhenDismissingTheEmailTip(object):
+
+    def test_it_sets_a_cookie(self, dismiss_tip):
+        cookies = SimpleCookie()
+        cookies.load(dismiss_tip.headers.get('Set-Cookie'))
+        assert 'seen_email_tip' in cookies
+        assert int(cookies['seen_email_tip'].value) == 2
