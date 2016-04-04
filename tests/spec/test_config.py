@@ -3,9 +3,9 @@ from unittest.mock import patch
 from app.factory import create_app
 
 
-class TestWhenDeployedInAWS(object):
+class WhenDeployedInAWS(object):
 
-    def test_it_fetches_secrets_from_credstash(self):
+    def it_fetches_secrets_from_credstash(self):
 
         patcher = patch('lib.aws_env.env.__getitem__')
         get = patcher.start()

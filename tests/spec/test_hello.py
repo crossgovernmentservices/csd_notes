@@ -7,8 +7,7 @@ def response(client):
     return client.get(url_for('base.index'))
 
 
-@pytest.mark.use_fixtures('response')
-class TestWhenBrowsingToIndexPage(object):
+class WhenBrowsingToIndexPage(object):
 
-    def test_it_shows_hello_world(self, response):
+    def it_shows_hello_world(self, response):
         assert 'Hello World!' in response.get_data(as_text=True)

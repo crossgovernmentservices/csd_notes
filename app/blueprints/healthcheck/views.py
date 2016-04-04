@@ -12,10 +12,6 @@ healthcheck = Blueprint('healthcheck', __name__)
 @healthcheck.route('/healthcheck.json')
 def check_health():
     status = {
-        # 'database': False,
-        # 'migrations': False,
-        # 'mail': False,
-        # 'cache': False,
         'site': True}
 
     code = 200
