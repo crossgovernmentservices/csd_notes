@@ -1,12 +1,9 @@
-import pytest
-
 from app.blueprints.notes.models import Note
 
 
-@pytest.mark.use_fixtures('app', 'db')
-class TestWhenUpdatingANote(object):
+class WhenUpdatingANote(object):
 
-    def test_it_stores_the_previous_version(self, db_session):
+    def it_stores_the_previous_version(self, db_session):
         note = Note.create('Test note')
         assert len(note.history) == 0
 
@@ -17,10 +14,9 @@ class TestWhenUpdatingANote(object):
         assert note.history[0].version == 1
 
 
-@pytest.mark.use_fixtures('app', 'db')
-class TestWhenANoteHasHistory(object):
+class WhenANoteHasHistory(object):
 
-    def test_it_can_be_reverted_to_a_previous_version(self, db_session):
+    def it_can_be_reverted_to_a_previous_version(self, db_session):
         note = Note.create('Test note')
         note.update('Test note edited')
         note.update('Test note edited again')

@@ -53,10 +53,9 @@ def dismiss_tip(client):
     return client.get(url_for('notes.dismiss_tip'))
 
 
-@pytest.mark.use_fixtures('seen_twice_already', 'soup')
-class TestWhenViewingNotesListPage(object):
+class WhenViewingNotesListPage(object):
 
-    def test_it_lists_notes_in_reverse_chronological_order(self, soup):
+    def it_lists_notes_in_reverse_chronological_order(self, soup):
         notes = soup.find_all(class_='note')
         assert len(notes) == 3
 
@@ -66,35 +65,35 @@ class TestWhenViewingNotesListPage(object):
         assert timestamp(notes[0]) >= timestamp(notes[1])
         assert timestamp(notes[1]) >= timestamp(notes[2])
 
-    def test_it_renders_note_contents_as_markdown(self, soup):
+    def it_renders_note_contents_as_markdown(self, soup):
         note = soup.find_all(class_='note')[0]
         assert len(note.find_all('em')) > 0
 
-    def test_it_shows_only_the_first_250_characters_of_a_note(self, soup):
+    def it_shows_only_the_first_250_characters_of_a_note(self, soup):
         notes = soup.find_all(class_='note')
         for note in notes:
             assert len(Markup(note.find(itemprop='text')).striptags()) <= 250
 
-    def test_it_shows_the_email_tip(self, soup):
+    def it_shows_the_email_tip(self, soup):
         tip = soup.find(class_='message-box')
         assert tip.find('a')['href'].startswith('mailto:')
 
-    def test_it_sets_a_cookie_if_it_has_been_seen_twice_already(
+    def it_sets_a_cookie_if_it_has_been_seen_twice_already(
             self, seen_twice_already):
         cookies = SimpleCookie()
         cookies.load(seen_twice_already.headers.get('Set-Cookie'))
         assert 'seen_email_tip' in cookies
         assert int(cookies['seen_email_tip'].value) == 2
 
-    def test_it_hides_the_email_tip_if_it_has_been_seen_twice_already(
+    def it_hides_the_email_tip_if_it_has_been_seen_twice_already(
             self, seen_twice_already_soup):
         tip = seen_twice_already_soup.find(class_='message-box')
         assert tip is None
 
 
-class TestWhenDismissingTheEmailTip(object):
+class WhenDismissingTheEmailTip(object):
 
-    def test_it_sets_a_cookie(self, dismiss_tip):
+    def it_sets_a_cookie(self, dismiss_tip):
         cookies = SimpleCookie()
         cookies.load(dismiss_tip.headers.get('Set-Cookie'))
         assert 'seen_email_tip' in cookies

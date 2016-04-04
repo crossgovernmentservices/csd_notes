@@ -20,7 +20,7 @@ manager.add_command('db', MigrateCommand)
 
 
 def run_tests(module=None, *args):
-    argv = ['-q', '--flakes', '--mccabe', '--pep8', '--spec']
+    argv = []
 
     if module:
         argv.extend(['--pyargs', module])
@@ -33,7 +33,7 @@ def run_tests(module=None, *args):
 
 @manager.command
 def test():
-    run_tests('tests.spec')
+    run_tests('tests.spec', '--spec')
 
 
 @manager.command
