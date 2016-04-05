@@ -33,7 +33,7 @@ SESSION_COOKIE_SECURE = False
 SQLALCHEMY_DATABASE_PATH = join(dirname(__file__), '../development.db')
 
 SQLALCHEMY_DATABASE_URI = env.get(
-    'DATABASE_URI',
+    'DATABASE_URL',
     'sqlite:///{}'.format(SQLALCHEMY_DATABASE_PATH))
 
 SQLALCHEMY_TRACK_MODIFICATIONS = bool(env.get(
