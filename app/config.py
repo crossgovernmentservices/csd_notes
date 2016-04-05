@@ -19,6 +19,13 @@ DEBUG = bool(env.get('DEBUG', True))
 
 HUMANIZE_USE_UTC = True
 
+MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.nl2br',
+    'markdown.extensions.sane_lists',
+    'markdown.extensions.smart_strong',
+    'markdown.extensions.smarty',
+]
+
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
 SESSION_COOKIE_SECURE = False

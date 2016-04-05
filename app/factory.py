@@ -93,7 +93,7 @@ def register_extensions(app):
     Migrate().init_app(app, db)
 
     from flaskext.markdown import Markdown
-    Markdown(app)
+    Markdown(app, extensions=app.config.get('MARKDOWN_EXTENSIONS', []))
 
     from flask.ext.humanize import Humanize
     Humanize(app)
