@@ -13,6 +13,16 @@ class WhenUpdatingANote(object):
         assert note.history[0].content == 'Test note'
         assert note.history[0].version == 1
 
+    def it_strips_html_tags_from_the_user_input(self, db_session):
+        note = Note.create('<script>alert("bad things")</script>')
+        assert note.content == 'alert("bad things")'
+
+        note.update('<form action="evil.com/phish"><input name="cc"></form>')
+        assert note.content == ''
+
+        note.update('<p style="color: pink">woo!</p>')
+        assert note.content == 'woo!'
+
 
 class WhenANoteHasHistory(object):
 
