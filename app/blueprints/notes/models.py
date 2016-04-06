@@ -5,6 +5,8 @@ Notes models
 
 import datetime
 
+from bs4 import BeautifulSoup
+
 from app.extensions import db
 
 
@@ -24,10 +26,16 @@ class Note(db.Model):
                     version,
                     note.id))
 
+    def set_content(self, content):
+        soup = BeautifulSoup(content)
+        nodes = soup.recursiveChildGenerator()
+        text_nodes = [e for e in nodes if isinstance(e, str)]
+        self.content = ''.join(text_nodes)
+
     @classmethod
     def create(cls, content, is_email=False):
         note = Note()
-        note.content = content
+        note.set_content(content)
         note.created = datetime.datetime.utcnow()
         note.updated = note.created
         note.is_email = is_email
@@ -40,7 +48,7 @@ class Note(db.Model):
         version = NoteHistory(self, now)
         db.session.add(version)
         self.history.append(version)
-        self.content = content
+        self.set_content(content)
         self.updated = now
         db.session.add(self)
         db.session.commit()
