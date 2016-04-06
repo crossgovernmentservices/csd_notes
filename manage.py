@@ -30,27 +30,27 @@ def run_tests(module=None, *args):
     if args:
         argv.extend(args)
 
-    pytest.main(argv)
+    return pytest.main(argv)
 
 
 @manager.command
 def test():
-    run_tests('tests.spec', '--spec')
+    return run_tests('tests.spec', '--spec')
 
 
 @manager.command
 def smoketest():
-    run_tests('tests.smoke', '--start-live-server')
+    return run_tests('tests.smoke', '--start-live-server')
 
 
 @manager.command
 def all_tests():
-    run_tests()
+    return run_tests()
 
 
 @manager.command
 def coverage():
-    run_tests('tests.spec', '--cov=app', '--cov-report=html')
+    return run_tests('tests.spec', '--cov=app', '--cov-report=html')
 
 
 def download(url, to=None):
