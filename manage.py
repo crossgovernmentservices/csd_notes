@@ -7,6 +7,7 @@ import pytest
 
 from app.factory import create_app
 from lib.govuk_assets import ManageGovUkAssets
+from lib.travis_ci import travis_fold
 
 
 manager = Manager(create_app)
@@ -45,6 +46,14 @@ def all_tests():
 @manager.command
 def coverage():
     return run_tests('tests.spec', '--cov=app', '--cov-report=html')
+
+
+@manager.command
+def build_and_test():
+    with travis_fold('install_all_govuk_assets'):
+        manager.handle('', ['install_all_govuk_assets', '--clean'])
+
+    return test()
 
 
 if __name__ == '__main__':
