@@ -64,6 +64,19 @@ def dismiss_tip():
     return redirect(url_for('.list'))
 
 
+@notes.route('/notes/<id>/undo', methods=['POST'])
+def undo(id):
+    note = Note.query.get(id)
+
+    try:
+        note.revert()
+
+    except note.VersionDoesNotExist:
+        pass
+
+    return redirect(url_for('.list'))
+
+
 @notes.route('/notes/<id>/edit', methods=['POST'])
 def edit(id):
     note = Note.query.get(id)

@@ -31,3 +31,6 @@ class WhenAddingANewNote(object):
 
         content = str(notes[0].find(itemprop='text'))
         assert 'A <em>lovely</em> new note' in content
+
+        undo_link = notes[0].find(class_='undo-link')
+        assert undo_link is None
