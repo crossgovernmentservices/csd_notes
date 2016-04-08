@@ -13,7 +13,6 @@ flask-script
 flask-security
 flask-sqlalchemy
 flask-wtf
-html5lib-truncation
 libsass
 markdown
 pytest
