@@ -1,40 +1,44 @@
 (function($, window) {
 
-  $(function() {
-    var $addnoteform = $('.add-note-form');
+  function expandToFitContent() {
+    var $textarea = $(this);
+    var vPadding = (
+      parseInt($textarea.css('padding-top')) +
+      parseInt($textarea.css('padding-bottom')));
 
-    $addnoteform.find('textarea').focus();
+    function fitContent() {
+      $textarea.height($textarea.prop('scrollHeight') - vPadding);
+    }
 
-    $addnoteform.on('click', function() {
-      clearActive();
-      $(this).addClass('active');
-    });
+    $textarea.css({'overflow-y': 'hidden'});
+    $textarea.on('input focus', fitContent);
 
-    $addnoteform.find('textarea').on('keydown', function() {
-      $addnoteform.addClass('active');
-    });
-
-    // taken from 
-    // http://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
-    $('textarea').each(function () {
-      this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-    }).on('input focus', function () {
-      this.style.height = 'auto';
-      this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    $('.note').on('click', function() {
-      clearActive();
-      $(this)
-        .addClass("edit-mode")
-        .find('textarea')
-          .focus();
-    })
-  });
-
-  function clearActive() {
-    $('.note').removeClass("edit-mode");
-    $('.add-note-form').removeClass("active");
+    fitContent();
   }
+
+  function editOnClick() {
+    var $el = $(this);
+
+    function activate() {
+      $('.editOnClick.active.edit-mode').removeClass('active edit-mode');
+      $el.addClass('active edit-mode');
+    }
+
+    function edit() {
+      activate();
+      $el.find('textarea').focus();
+    }
+
+    $el.find('textarea').on('keydown', activate);
+    $el.on('click', edit);
+  }
+
+  $(function() {
+    $('.editOnClick').each(editOnClick);
+
+    $('.expandToFitContent').each(expandToFitContent);
+
+    $('.add-note-form').find('textarea').focus();
+  });
 
 }).call(this, jQuery, window);

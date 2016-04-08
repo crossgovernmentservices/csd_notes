@@ -7,13 +7,13 @@
 {% endblock %}
 
 {% macro note_element(note) %}
-  <li class="note" itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
+  <li class="note editOnClick" itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
     <section class="text rendered-markdown rendered-note" itemprop="text">
       {{ note.content|markdown|truncate_html(250, end=" \u2026") }}
     </section>
     <section>
       <form action="{{ url_for('notes.edit', id=note.id) }}" method="post" class="form note-form">
-        <textarea name="content" id="content" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
+        <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
         <button class="button">Save</button>
       </form>
     </section>
@@ -52,8 +52,8 @@
 
   </div>
 
-  <form action="{{ url_for('notes.add') }}" method="post" class="form note-form add-note-form">
-    <textarea name="content" rows="1" placeholder="Write a note &hellip;"></textarea>
+  <form action="{{ url_for('notes.add') }}" method="post" class="form note-form add-note-form editOnClick">
+    <textarea name="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;"></textarea>
     <button class="button">Save</button>
   </form>
 
