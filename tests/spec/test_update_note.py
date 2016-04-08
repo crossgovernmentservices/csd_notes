@@ -2,11 +2,19 @@ from bs4 import BeautifulSoup
 from flask import url_for
 import pytest
 
+from app.blueprints.notes.models import Note
+
 
 @pytest.fixture
-def form_submit(client):
-    return client.post(url_for('notes.add'), data={
-        'content': 'A *lovely* new note'})
+def example_note():
+    note = Note.create('Original content')
+    return note
+
+
+@pytest.fixture
+def form_submit(client, example_note):
+    return client.post(url_for('notes.edit', id=example_note.id), data={
+        'content': 'In ur notes, changin ur texts'})
 
 
 @pytest.fixture
@@ -19,7 +27,7 @@ def soup(follow_redirect):
     return BeautifulSoup(follow_redirect.get_data(as_text=True), 'html.parser')
 
 
-class WhenAddingANewNote(object):
+class WhenUpdatingANote(object):
 
     def it_redirects_to_the_list_view(self, db_session, form_submit):
         assert form_submit.status_code == 302
@@ -27,10 +35,5 @@ class WhenAddingANewNote(object):
 
     def it_updates_the_list_view(self, db_session, soup):
         notes = soup.find_all(class_='note')
-        assert len(notes) > 0
-
         content = str(notes[0].find(itemprop='text'))
-        assert 'A <em>lovely</em> new note' in content
-
-        undo_link = notes[0].find(class_='undo-link')
-        assert undo_link is None
+        assert 'In ur notes, changin ur texts' in content
