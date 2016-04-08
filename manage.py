@@ -16,36 +16,32 @@ manager.add_command('db', MigrateCommand)
 manager.add_command('install_all_govuk_assets', ManageGovUkAssets())
 
 
-def run_tests(module=None, *args):
-    argv = []
-
-    if module:
-        argv.extend(['--pyargs', module])
-
-    if args:
-        argv.extend(args)
-
-    return pytest.main(argv)
+suites = {
+    'spec': ['--pyargs', 'tests.spec', '--spec'],
+    'smoke': ['--pyargs', 'tests.smoke', '--start-live-server'],
+    'ui': ['--pyargs', 'tests.ui', '--start-live-server'],
+    'all': ['--start-live-server'],
+    'coverage': ['--pyargs', 'tests.spec', '--cov=app', '--cov-report=html']
+}
 
 
-@manager.command
-def test():
-    return run_tests('tests.spec', '--spec')
+@manager.option(
+    'suite', default='all', nargs='?', choices=suites.keys(),
+    help='Specify test suite to run (default all)')
+@manager.option('--spec', action='store_true', help='Output in spec style')
+def test(spec, suite):
+    """Runs tests"""
+    args = []
 
+    if spec:
+        args.extend(['--spec'])
 
-@manager.command
-def smoketest():
-    return run_tests('tests.smoke', '--start-live-server')
+    if not suite:
+        suite = 'all'
 
+    args.extend(suites[suite])
 
-@manager.command
-def all_tests():
-    return run_tests()
-
-
-@manager.command
-def coverage():
-    return run_tests('tests.spec', '--cov=app', '--cov-report=html')
+    return pytest.main(args)
 
 
 @manager.command
@@ -53,7 +49,7 @@ def build_and_test():
     with travis_fold('install_all_govuk_assets'):
         manager.handle('', ['install_all_govuk_assets', '--clean'])
 
-    return test()
+    return test(spec=True, suite='spec')
 
 
 if __name__ == '__main__':
