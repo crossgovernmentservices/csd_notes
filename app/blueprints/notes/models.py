@@ -27,7 +27,7 @@ class Note(db.Model):
                     note.id))
 
     def set_content(self, content):
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content, 'html.parser')
         nodes = soup.recursiveChildGenerator()
         text_nodes = [e for e in nodes if isinstance(e, str)]
         self.content = ''.join(text_nodes)

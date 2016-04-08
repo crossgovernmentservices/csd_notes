@@ -104,7 +104,7 @@ def register_filters(app):
     Import and register Jinja filters
     """
 
-    from html5lib_truncation import truncate_html
+    from lib.html_truncation import truncate_html
     from markupsafe import Markup
 
     def truncate(*args, **kwargs):
