@@ -60,3 +60,9 @@ def db_session(db, request):
     request.addfinalizer(teardown)
 
     return session
+
+
+@pytest.fixture
+def selenium(db, live_server, selenium):
+    """Override selenium fixture to always use flask live server"""
+    return selenium
