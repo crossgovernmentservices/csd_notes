@@ -39,6 +39,10 @@
     $('.expandToFitContent').each(expandToFitContent);
 
     $('.add-note-form').find('textarea').focus();
+
+    $('body').on('click', function () {
+      $('.undo-link').hide().next('.note-date').removeClass('hidden');
+    });
   });
 
 }).call(this, jQuery, window);
