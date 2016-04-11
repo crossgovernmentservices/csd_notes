@@ -13,10 +13,21 @@ if env.get('SETTINGS') == 'AWS':
     from lib.aws_env import env
 
 
-ASSETS_DEBUG = False
-
 DEBUG = bool(env.get('DEBUG', True))
 
+SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
+
+SQLALCHEMY_DATABASE_URI = env.get(
+    'DATABASE_URL',
+    'sqlite:///{}'.format(join(dirname(__file__), '../development.db')))
+
+
+# XXX Don't change the following settings unless necessary
+
+# Skips concatenation of bundles if True, which breaks everything
+ASSETS_DEBUG = False
+
+# Calculate friendly times using UTC instead of local timezone
 HUMANIZE_USE_UTC = True
 
 MARKDOWN_EXTENSIONS = [
@@ -26,18 +37,8 @@ MARKDOWN_EXTENSIONS = [
     'markdown.extensions.smarty',
 ]
 
-SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
-
+# TODO this should be True when served via HTTPS
 SESSION_COOKIE_SECURE = False
 
-SQLALCHEMY_DATABASE_PATH = join(dirname(__file__), '../development.db')
-
-SQLALCHEMY_DATABASE_URI = env.get(
-    'DATABASE_URL',
-    'sqlite:///{}'.format(SQLALCHEMY_DATABASE_PATH))
-
-SQLALCHEMY_TRACK_MODIFICATIONS = bool(env.get(
-    'SQLALCHEMY_TRACK_MODIFICATIONS',
-    False))
-
-TESTING = bool(env.get('TESTING', False))
+# Track modifications of objects and emit signals. Requires extra memory.
+SQLALCHEMY_TRACK_MODIFICATIONS = False
