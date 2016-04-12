@@ -3,6 +3,8 @@
 Notes views
 """
 
+import datetime
+
 from flask import (
     Blueprint,
     after_this_request,
@@ -21,6 +23,7 @@ notes = Blueprint('notes', __name__)
 @notes.route('/notes')
 def list():
     all_notes = Note.query.order_by(desc(Note.updated)).all()
+    two_mins_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
 
     times_seen = int(request.cookies.get('seen_email_tip', 0))
     show_tip = times_seen < 2
@@ -40,7 +43,8 @@ def list():
         'notes/list.html',
         notes=all_notes,
         inbox_email='your-inbox@civilservice.digital',
-        show_tip=show_tip)
+        show_tip=show_tip,
+        undo_timeout=two_mins_ago)
 
 
 @notes.route('/notes', methods=['POST'])
