@@ -21,8 +21,8 @@
     <form action="{{ url_for('notes.undo', id=note.id) }}" method="post" class="undo-link">
       Just updated (<button>undo</button>)
     </form>
-    {%- endif -%}
-    <span class="note-date {%- if note.history %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.updated.strftime('%Y%m%d%H%M%S.%f') }}">
+    {%- endif %}
+    <span class="note-date {%- if note.history and note.updated > undo_timeout %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.updated.strftime('%Y%m%d%H%M%S.%f') }}">
       {{ note.updated|humanize() }}
     </span>
     {% if note.is_email %}
