@@ -6,31 +6,6 @@
   {% endassets %}
 {% endblock %}
 
-{% macro note_element(note) %}
-  <li class="note editOnClick" itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
-    <section class="text rendered-markdown rendered-note" itemprop="text">
-      {{ note.content|markdown|truncate_html(250, end=" \u2026") }}
-    </section>
-    <section>
-      <form action="{{ url_for('notes.edit', id=note.id) }}" method="post" class="form note-form">
-        <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
-        <button class="button">Save</button>
-      </form>
-    </section>
-    {% if note.history and note.updated > undo_timeout -%}
-    <form action="{{ url_for('notes.undo', id=note.id) }}" method="post" class="undo-link">
-      Just updated (<button>undo</button>)
-    </form>
-    {%- endif -%}
-    <span class="note-date {%- if note.history %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.updated.strftime('%Y%m%d%H%M%S.%f') }}">
-      {{ note.updated|humanize() }}
-    </span>
-    {% if note.is_email %}
-    <div class="email-flag">Email</div>
-    {% endif %}
-  </li>
-{% endmacro %}
-
 {% block body_content %}
 
   <div class="sign-out"></div>
@@ -58,7 +33,7 @@
 
   <ul class="notes-list">
   {% for note in notes %}
-    {{ note_element(note) }}
+    {% include "notes/note.html" %}
   {% endfor %}
   </ul>
 
