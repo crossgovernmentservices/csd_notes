@@ -44,5 +44,9 @@
 {% endblock %}
 
 {% block body_end %}
-<script src="/static/js/notesapp.js"></script>
+
+  {% assets "note_template", "js_notes" %}
+    <script src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+
 {% endblock %}

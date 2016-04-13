@@ -27,6 +27,10 @@ SQLALCHEMY_DATABASE_URI = env.get(
 # Skips concatenation of bundles if True, which breaks everything
 ASSETS_DEBUG = False
 
+ASSETS_LOAD_PATH = [
+    'app/static',
+    'app/templates']
+
 # Calculate friendly times using UTC instead of local timezone
 HUMANIZE_USE_UTC = True
 

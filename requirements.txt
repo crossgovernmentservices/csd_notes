@@ -2,7 +2,7 @@ boto
 bs4
 credstash
 flask
-flask-assets
+-e git://github.com/miracle2k/flask-assets.git#egg=flask-assets
 flask-humanize
 flask-login
 flask-mail
@@ -13,6 +13,7 @@ flask-script
 flask-security
 flask-sqlalchemy
 flask-wtf
+jinja-to-js
 libsass
 markdown
 pytest
