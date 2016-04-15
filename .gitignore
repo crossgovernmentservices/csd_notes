@@ -76,3 +76,4 @@ app/static/govuk_frontend_toolkit/
 app/static/govuk_template/
 app/templates/govuk_template/
 app/static/stylesheets/
+app/static/javascript/
