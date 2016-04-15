@@ -13,7 +13,7 @@ from app.blueprints.notes.models import Note
 def some_notes(db_session):
     content = '*Test note {{}}*\n{}'.format(
         'All work and no play makes Jack a dull boy\n' * 10)
-    return [Note.create(content.format(i)) for i in range(1, 4)]
+    return [Note.create(content.format(i)) for i in range(1, 12)]
 
 
 @pytest.fixture
@@ -57,7 +57,7 @@ class WhenViewingNotesListPage(object):
 
     def it_lists_notes_in_reverse_chronological_order(self, soup):
         notes = soup.find_all(class_='note')
-        assert len(notes) == 3
+        assert len(notes) >= 3
 
         def timestamp(note):
             return note.find(itemprop='dateModified')['data-timestamp']
@@ -89,6 +89,10 @@ class WhenViewingNotesListPage(object):
             self, seen_twice_already_soup):
         tip = seen_twice_already_soup.find(class_='message-box')
         assert tip is None
+
+    def it_shows_only_the_first_page_of_notes(self, soup):
+        notes = soup.find_all(class_='note')
+        assert len(notes) <= 10
 
 
 class WhenDismissingTheEmailTip(object):
