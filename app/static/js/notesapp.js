@@ -43,6 +43,10 @@
     $('body').on('click', function () {
       $('.undo-link').hide().next('.note-date').removeClass('hidden');
     });
+
+    $('.undo-link').on('click', function (event) {
+      event.stopPropagation();
+    });
   });
 
 }).call(this, jQuery, window);
