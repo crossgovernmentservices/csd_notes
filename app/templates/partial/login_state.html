@@ -2,7 +2,7 @@
   {% if current_user.is_authenticated -%}
 
   <span class="user-name">{{ current_user.full_name|default(current_user.email) }}</span>
-  <a href="{{ logout_url }}">Sign out</a>
+  <a href="{{ url_for('sso.logout') }}">Sign out</a>
 
   {%- else -%}
 
