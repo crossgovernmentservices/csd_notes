@@ -1,0 +1,12 @@
+<div class="sign-out">
+  {% if current_user.is_authenticated -%}
+
+  <span class="user-name">{{ current_user.full_name|default(current_user.email) }}</span>
+  <a href="{{ logout_url }}">Sign out</a>
+
+  {%- else -%}
+
+  <a href="{{ url_for('sso.login') }}">Sign in</a>
+
+  {%- endif %}
+</div>

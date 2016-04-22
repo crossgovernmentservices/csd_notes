@@ -13,12 +13,12 @@ def updated_note():
 
 
 @pytest.fixture
-def undo_submit(client, updated_note):
+def undo_submit(client, updated_note, logged_in):
     return client.post(url_for('notes.undo', id=updated_note.id))
 
 
 @pytest.fixture
-def follow_redirect(client, undo_submit):
+def follow_redirect(client, undo_submit, logged_in):
     return client.get(undo_submit.headers['Location'])
 
 
