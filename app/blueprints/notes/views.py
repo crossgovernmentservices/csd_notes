@@ -12,6 +12,7 @@ from flask import (
     render_template,
     request,
     url_for)
+from flask.ext.security import login_required
 from sqlalchemy import desc
 
 from app.blueprints.notes.models import Note
@@ -21,6 +22,7 @@ notes = Blueprint('notes', __name__)
 
 
 @notes.route('/notes')
+@login_required
 def list():
     all_notes = Note.query.order_by(desc(Note.updated)).all()
     two_mins_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
@@ -48,6 +50,7 @@ def list():
 
 
 @notes.route('/notes', methods=['POST'])
+@login_required
 def add():
     content = request.form.get('content', '').strip()
 
@@ -69,6 +72,7 @@ def dismiss_tip():
 
 
 @notes.route('/notes/<id>/undo', methods=['POST'])
+@login_required
 def undo(id):
     note = Note.query.get(id)
 
@@ -82,6 +86,7 @@ def undo(id):
 
 
 @notes.route('/notes/<id>/edit', methods=['POST'])
+@login_required
 def edit(id):
     note = Note.query.get(id)
 

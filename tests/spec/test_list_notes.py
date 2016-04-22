@@ -17,7 +17,7 @@ def some_notes(db_session):
 
 
 @pytest.fixture
-def response(client, some_notes):
+def response(client, some_notes, logged_in):
     return client.get(url_for('notes.list'))
 
 
@@ -27,12 +27,11 @@ def soup(response):
 
 
 @pytest.fixture
-def seen_twice_already(client):
+def seen_twice_already(client, logged_in):
     cookie = SimpleCookie()
     cookie['seen_email_tip'] = 2
     expires = datetime.datetime.now() + datetime.timedelta(days=1)
     expires = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-    print('expires', expires)
     cookie['seen_email_tip']['expires'] = expires
     cookie['seen_email_tip']['domain'] = 'localhost'
     cookie['seen_email_tip']['path'] = '/'
@@ -49,7 +48,7 @@ def seen_twice_already_soup(seen_twice_already):
 
 
 @pytest.fixture
-def dismiss_tip(client):
+def dismiss_tip(client, logged_in):
     return client.get(url_for('notes.dismiss_tip'))
 
 

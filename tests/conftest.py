@@ -1,6 +1,7 @@
 import os
 
 from flask.ext.migrate import upgrade
+import mock
 import pytest
 
 from app.factory import create_app
@@ -66,3 +67,20 @@ def db_session(db, request):
 def selenium(db, live_server, selenium):
     """Override selenium fixture to always use flask live server"""
     return selenium
+
+
+@pytest.fixture
+def current_user(request):
+    user_patch = mock.patch('flask_login.current_user')
+    current_user = user_patch.start()
+
+    @request.addfinalizer
+    def teardown():
+        user_patch.stop()
+
+    return current_user
+
+
+@pytest.fixture
+def logged_in(current_user):
+    current_user.is_authenticated = True

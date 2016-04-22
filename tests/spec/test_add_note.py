@@ -4,13 +4,13 @@ import pytest
 
 
 @pytest.fixture
-def form_submit(client):
+def form_submit(client, logged_in):
     return client.post(url_for('notes.add'), data={
         'content': 'A *lovely* new note'})
 
 
 @pytest.fixture
-def follow_redirect(client, form_submit):
+def follow_redirect(client, form_submit, logged_in):
     return client.get(form_submit.headers['Location'])
 
 

@@ -10,4 +10,4 @@ def response(client):
 class WhenBrowsingToIndexPage(object):
 
     def it_shows_hello_world(self, response):
-        assert 'Hello World!' in response.get_data(as_text=True)
+        assert 'Civil Service Digital' in response.get_data(as_text=True)

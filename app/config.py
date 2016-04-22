@@ -15,6 +15,20 @@ if env.get('SETTINGS') == 'AWS':
 
 DEBUG = bool(env.get('DEBUG', True))
 
+OIDC_PROVIDERS = {
+    'dex': {
+        'discovery_url': env.get('DEX_APP_DISCOVERY_URL'),
+        'client_id': env.get('DEX_APP_CLIENT_ID'),
+        'client_secret': env.get('DEX_APP_CLIENT_SECRET')
+    },
+    'google': {
+        'discovery_url': env.get('GOOGLE_APP_DISCOVERY_URL'),
+        'client_id': env.get('GOOGLE_APP_CLIENT_ID'),
+        'client_secret': env.get('GOOGLE_APP_CLIENT_SECRET'),
+        'redirect_uri': env.get('GOOGLE_APP_REDIRECT_URI')
+    }
+}
+
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
 SQLALCHEMY_DATABASE_URI = env.get(
@@ -36,6 +50,8 @@ MARKDOWN_EXTENSIONS = [
     'markdown.extensions.smart_strong',
     'markdown.extensions.smarty',
 ]
+
+SECURITY_PASSWORD_HASH = 'bcrypt'
 
 # TODO this should be True when served via HTTPS
 SESSION_COOKIE_SECURE = False
