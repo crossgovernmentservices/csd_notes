@@ -10,10 +10,18 @@ from jose import jwt
 import requests
 
 
+class KeyNotFound(Exception):
+    pass
+
+
 def verify_id_token(token, config):
     header = jwt.get_unverified_header(token)
-    key = [key for key in config['keys'] if key['kid'] == (header['kid'])]
-    return jwt.decode(token, key[0], audience=config['client_id'])
+    keys = [key for key in config['keys'] if key['kid'] == header['kid']]
+
+    if len(keys) == 0:
+        raise KeyNotFound()
+
+    return jwt.decode(token, keys[0], audience=config['client_id'])
 
 
 class OIDC(object):
@@ -62,9 +70,19 @@ class OIDC(object):
                 '{}/.well-known/openid-configuration'.format(
                     config['discovery_url'])).json())
 
-            if 'jwks_uri' in config:
-                config.update(requests.get(
-                    config['jwks_uri']).json())
+            self._config[provider_name] = config
+
+            self._fetch_keys(provider_name)
+
+        return config
+
+    def _fetch_keys(self, provider_name):
+
+        config = self._config.get(provider_name, {})
+
+        if 'jwks_uri' in config:
+            config.update(requests.get(
+                config['jwks_uri']).json())
 
             self._config[provider_name] = config
 
@@ -97,7 +115,13 @@ class OIDC(object):
 
         access_token = token_response['access_token']
 
-        claims = verify_id_token(token_response['id_token'], config)
+        try:
+            claims = verify_id_token(token_response['id_token'], config)
+
+        except KeyNotFound:
+            # refresh keys, in case they have been rotated
+            self._fetch_keys(provider_name)
+            claims = verify_id_token(token_response['id_token'], config)
 
         claims.update(self.userinfo(config, access_token))
 
