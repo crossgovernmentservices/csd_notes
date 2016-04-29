@@ -4,6 +4,7 @@ Base models
 """
 
 from flask.ext.security import RoleMixin, UserMixin
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from app.extensions import db
 
@@ -32,3 +33,18 @@ class User(db.Model, UserMixin):
         'Role',
         secondary=user_roles,
         backref=db.backref('users', lazy='dynamic'))
+
+    @classmethod
+    def get_or_create(cls, **kwargs):
+        try:
+            user = User.query.filter_by(**kwargs).one()
+
+        except NoResultFound:
+            user = User(**kwargs)
+            db.session.add(user)
+            db.session.commit()
+
+        except MultipleResultsFound:
+            raise
+
+        return user

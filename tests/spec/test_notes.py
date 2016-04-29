@@ -1,10 +1,19 @@
+import pytest
+
 from app.blueprints.notes.models import Note
+
+
+class WhenCreatingANote(object):
+
+    def it_must_have_an_author(self, db_session):
+        with pytest.raises(TypeError):
+            Note.create('Test note')
 
 
 class WhenUpdatingANote(object):
 
-    def it_stores_the_previous_version(self, db_session):
-        note = Note.create('Test note')
+    def it_stores_the_previous_version(self, db_session, test_user):
+        note = Note.create('Test note', test_user)
         assert len(note.history) == 0
 
         note.update('Test note edited')
@@ -13,8 +22,8 @@ class WhenUpdatingANote(object):
         assert note.history[0].content == 'Test note'
         assert note.history[0].version == 1
 
-    def it_strips_html_tags_from_the_user_input(self, db_session):
-        note = Note.create('<script>alert("bad things")</script>')
+    def it_strips_html_tags_from_the_user_input(self, db_session, test_user):
+        note = Note.create('<script>alert("bad things")</script>', test_user)
         assert note.content == 'alert("bad things")'
 
         note.update('<form action="evil.com/phish"><input name="cc"></form>')
@@ -26,8 +35,8 @@ class WhenUpdatingANote(object):
 
 class WhenANoteHasHistory(object):
 
-    def it_can_be_reverted_to_a_previous_version(self, db_session):
-        note = Note.create('Test note')
+    def it_can_be_reverted_to_a_previous_version(self, db_session, test_user):
+        note = Note.create('Test note', test_user)
         note.update('Test note edited')
         note.update('Test note edited again')
         assert len(note.history) == 2

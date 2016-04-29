@@ -6,8 +6,8 @@ from app.blueprints.notes.models import Note
 
 
 @pytest.fixture
-def example_note():
-    note = Note.create('Original content')
+def example_note(db_session, test_user):
+    note = Note.create('Original content', test_user)
     return note
 
 

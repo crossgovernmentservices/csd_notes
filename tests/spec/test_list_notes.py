@@ -1,4 +1,3 @@
-import datetime
 from http.cookies import SimpleCookie
 
 from bs4 import BeautifulSoup
@@ -10,10 +9,10 @@ from app.blueprints.notes.models import Note
 
 
 @pytest.fixture
-def some_notes(db_session):
+def some_notes(db_session, test_user):
     content = '*Test note {{}}*\n{}'.format(
         'All work and no play makes Jack a dull boy\n' * 10)
-    return [Note.create(content.format(i)) for i in range(1, 4)]
+    return [Note.create(content.format(i), test_user) for i in range(1, 4)]
 
 
 @pytest.fixture
@@ -28,16 +27,9 @@ def soup(response):
 
 @pytest.fixture
 def seen_twice_already(client, logged_in):
-    cookie = SimpleCookie()
-    cookie['seen_email_tip'] = 2
-    expires = datetime.datetime.now() + datetime.timedelta(days=1)
-    expires = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-    cookie['seen_email_tip']['expires'] = expires
-    cookie['seen_email_tip']['domain'] = 'localhost'
-    cookie['seen_email_tip']['path'] = '/'
-
-    return client.get(url_for('notes.list'), headers={
-        'Cookie': cookie.output(header='')})
+    client.set_cookie('localhost', 'seen_email_tip', '2')
+    response = client.get(url_for('notes.list'))
+    return response
 
 
 @pytest.fixture
@@ -77,12 +69,12 @@ class WhenViewingNotesListPage(object):
         tip = soup.find(class_='message-box')
         assert tip.find('a')['href'].startswith('mailto:')
 
-    def it_sets_a_cookie_if_it_has_been_seen_twice_already(
-            self, seen_twice_already):
+    def it_sets_a_cookie_if_it_has_not_been_seen_twice_already(self, response):
         cookies = SimpleCookie()
-        cookies.load(seen_twice_already.headers.get('Set-Cookie'))
+        for header in response.headers.getlist('Set-Cookie'):
+            cookies.load(header)
         assert 'seen_email_tip' in cookies
-        assert int(cookies['seen_email_tip'].value) == 2
+        assert int(cookies['seen_email_tip'].value) == 1
 
     def it_hides_the_email_tip_if_it_has_been_seen_twice_already(
             self, seen_twice_already_soup):
