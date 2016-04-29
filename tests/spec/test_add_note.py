@@ -10,7 +10,7 @@ def form_submit(client, logged_in):
 
 
 @pytest.fixture
-def follow_redirect(client, form_submit, logged_in):
+def follow_redirect(client, form_submit):
     return client.get(form_submit.headers['Location'])
 
 
@@ -19,13 +19,14 @@ def soup(follow_redirect):
     return BeautifulSoup(follow_redirect.get_data(as_text=True), 'html.parser')
 
 
+@pytest.mark.use_fixtures('db_session', 'logged_in')
 class WhenAddingANewNote(object):
 
-    def it_redirects_to_the_list_view(self, db_session, form_submit):
+    def it_redirects_to_the_list_view(self, form_submit):
         assert form_submit.status_code == 302
         assert url_for('notes.list') in form_submit.headers['Location']
 
-    def it_updates_the_list_view(self, db_session, soup):
+    def it_updates_the_list_view(self, soup):
         notes = soup.find_all(class_='note')
         assert len(notes) > 0
 

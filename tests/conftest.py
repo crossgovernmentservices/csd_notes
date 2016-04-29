@@ -4,6 +4,7 @@ from flask.ext.migrate import upgrade
 import mock
 import pytest
 
+from app.blueprints.base.models import User
 from app.factory import create_app
 
 
@@ -70,17 +71,19 @@ def selenium(db, live_server, selenium):
 
 
 @pytest.fixture
-def current_user(request):
-    user_patch = mock.patch('flask_login.current_user')
-    current_user = user_patch.start()
-
-    @request.addfinalizer
-    def teardown():
-        user_patch.stop()
-
-    return current_user
+def test_user(db_session):
+    return User.get_or_create(email='test@example.com', full_name='Test Test')
 
 
-@pytest.fixture
-def logged_in(current_user):
-    current_user.is_authenticated = True
+@pytest.yield_fixture
+def logged_in(client, test_user):
+
+    with client.session_transaction() as session:
+        session['user_id'] = test_user.id
+        session['_fresh'] = True
+
+    yield test_user
+
+    with client.session_transaction() as session:
+        del session['user_id']
+        del session['_fresh']
