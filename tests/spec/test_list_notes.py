@@ -5,6 +5,7 @@ from flask import url_for
 from markupsafe import Markup
 import pytest
 
+from app.blueprints.base.models import User
 from app.blueprints.notes.models import Note
 
 
@@ -16,7 +17,15 @@ def some_notes(db_session, test_user):
 
 
 @pytest.fixture
-def response(client, some_notes, logged_in):
+def someone_elses_note(db_session):
+    other_user = User(email='test2@example.com', full_name='Test2 Test')
+    db_session.add(other_user)
+    note = Note.create('This is not your note', other_user)
+    return note
+
+
+@pytest.fixture
+def response(client, logged_in):
     return client.get(url_for('notes.list'))
 
 
@@ -46,9 +55,12 @@ def dismiss_tip(client, logged_in):
 
 class WhenViewingNotesListPage(object):
 
-    def it_lists_notes_in_reverse_chronological_order(self, soup):
+    def it_shows_only_current_users_notes(self, someone_elses_note, response):
+        assert 'This is not your note' not in response.get_data(as_text=True)
+
+    def it_lists_notes_in_reverse_chronological_order(self, some_notes, soup):
         notes = soup.find_all(class_='note')
-        assert len(notes) == 3
+        assert len(notes) >= 3
 
         def timestamp(note):
             return note.find(itemprop='dateModified')['data-timestamp']
@@ -56,11 +68,11 @@ class WhenViewingNotesListPage(object):
         assert timestamp(notes[0]) >= timestamp(notes[1])
         assert timestamp(notes[1]) >= timestamp(notes[2])
 
-    def it_renders_note_contents_as_markdown(self, soup):
+    def it_renders_note_contents_as_markdown(self, some_notes, soup):
         note = soup.find_all(class_='note')[0]
         assert len(note.find_all('em')) > 0
 
-    def it_shows_only_the_first_250_characters_of_a_note(self, soup):
+    def it_shows_only_first_250_chars_of_a_note(self, some_notes, soup):
         notes = soup.find_all(class_='note')
         for note in notes:
             assert len(Markup(note.find(itemprop='text')).striptags()) <= 250
