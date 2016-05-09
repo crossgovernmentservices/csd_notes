@@ -7,70 +7,79 @@ import datetime
 
 from flask import (
     Blueprint,
-    after_this_request,
+    abort,
+    jsonify,
     redirect,
     render_template,
     request,
     url_for)
+from flask_login import current_user
+from flask.ext.security import login_required
 from sqlalchemy import desc
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+from app.blueprints.notes.email_tip import EmailTip
 from app.blueprints.notes.models import Note
 
 
 notes = Blueprint('notes', __name__)
 
 
+def two_mins_ago():
+    return datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
+
+
+@notes.context_processor
+def notes_context():
+    return {'undo_timeout': two_mins_ago}
+
+
+def get_or_404(class_, **kwargs):
+    try:
+        return class_.query.filter_by(**kwargs).one()
+
+    except NoResultFound:
+        abort(404)
+
+    except MultipleResultsFound:
+        raise
+
+
 @notes.route('/notes')
+@login_required
 def list():
-    all_notes = Note.query.order_by(desc(Note.updated)).all()
-    two_mins_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
+    notes = Note.query.filter(Note.author == current_user)
+    notes = notes.order_by(desc(Note.updated)).all()
 
-    times_seen = int(request.cookies.get('seen_email_tip', 0))
-    show_tip = times_seen < 2
+    email_tip = EmailTip()
+    email_tip.incr_times_seen()
 
-    @after_this_request
-    def set_cookie(response):
-        times = str(times_seen)
-
-        if show_tip:
-            times = str(times_seen + 1)
-
-        response.set_cookie('seen_email_tip', times)
-
-        return response
-
-    return render_template(
-        'notes/list.html',
-        notes=all_notes,
-        inbox_email='your-inbox@civilservice.digital',
-        show_tip=show_tip,
-        undo_timeout=two_mins_ago)
+    return render_template('notes/list.html', notes=notes)
 
 
 @notes.route('/notes', methods=['POST'])
+@login_required
 def add():
     content = request.form.get('content', '').strip()
 
     if content:
-        Note.create(content)
+        Note.create(content, current_user)
 
     return redirect(url_for('.list'))
 
 
 @notes.route('/notes/dismiss-email-tip')
 def dismiss_tip():
-
-    @after_this_request
-    def set_cookie(response):
-        response.set_cookie('seen_email_tip', '2')
-        return response
+    email_tip = EmailTip()
+    email_tip.times_seen = 2
 
     return redirect(url_for('.list'))
 
 
 @notes.route('/notes/<id>/undo', methods=['POST'])
+@login_required
 def undo(id):
-    note = Note.query.get(id)
+    note = get_or_404(Note, id=id, author=current_user)
 
     try:
         note.revert()
@@ -82,9 +91,24 @@ def undo(id):
 
 
 @notes.route('/notes/<id>/edit', methods=['POST'])
+@login_required
 def edit(id):
-    note = Note.query.get(id)
+    note = get_or_404(Note, id=id, author=current_user)
 
     note.update(request.form['content'])
 
     return redirect(url_for('.list'))
+
+
+@notes.route('/notes/search.json')
+@login_required
+def search_json():
+    term = request.args.get('q')
+    return jsonify({'results': [note.json for note in Note.search(term)]})
+
+
+@notes.route('/notes/search')
+@login_required
+def search():
+    term = request.args.get('q')
+    return render_template('notes/list.html', notes=Note.search(term))

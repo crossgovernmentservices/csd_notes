@@ -6,19 +6,19 @@ from app.blueprints.notes.models import Note
 
 
 @pytest.fixture
-def example_note():
-    note = Note.create('Original content')
+def example_note(db_session, test_user):
+    note = Note.create('Original content', test_user)
     return note
 
 
 @pytest.fixture
-def form_submit(client, example_note):
+def form_submit(client, example_note, logged_in):
     return client.post(url_for('notes.edit', id=example_note.id), data={
         'content': 'In ur notes, changin ur texts'})
 
 
 @pytest.fixture
-def follow_redirect(client, form_submit):
+def follow_redirect(client, form_submit, logged_in):
     return client.get(form_submit.headers['Location'])
 
 

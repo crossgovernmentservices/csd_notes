@@ -10,6 +10,13 @@ from bs4 import BeautifulSoup
 from app.extensions import db
 
 
+def sanitize(content):
+    soup = BeautifulSoup(content, 'html.parser')
+    nodes = soup.recursiveChildGenerator()
+    text_nodes = [e for e in nodes if isinstance(e, str)]
+    return ''.join(text_nodes)
+
+
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
@@ -17,6 +24,8 @@ class Note(db.Model):
     updated = db.Column(db.DateTime)
     is_email = db.Column(db.Boolean)
     history = db.relationship('NoteHistory', backref='note', cascade='delete')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author = db.relationship('User', backref='notes')
 
     class VersionDoesNotExist(Exception):
 
@@ -26,19 +35,14 @@ class Note(db.Model):
                     version,
                     note.id))
 
-    def set_content(self, content):
-        soup = BeautifulSoup(content, 'html.parser')
-        nodes = soup.recursiveChildGenerator()
-        text_nodes = [e for e in nodes if isinstance(e, str)]
-        self.content = ''.join(text_nodes)
-
     @classmethod
-    def create(cls, content, is_email=False):
-        note = Note()
-        note.set_content(content)
+    def create(cls, content, author, is_email=False):
+        note = Note(
+            content=sanitize(content),
+            author=author,
+            is_email=is_email)
         note.created = datetime.datetime.utcnow()
         note.updated = note.created
-        note.is_email = is_email
         db.session.add(note)
         db.session.commit()
         return note
@@ -48,7 +52,7 @@ class Note(db.Model):
         version = NoteHistory(self, now)
         db.session.add(version)
         self.history.append(version)
-        self.set_content(content)
+        self.content = sanitize(content)
         self.updated = now
         db.session.add(self)
         db.session.commit()

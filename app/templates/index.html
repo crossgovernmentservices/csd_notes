@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
 {% block body_content %}
-<h1>Hello World!</h1>
+
+  <h1 class="heading-large">Civil Service Digital</h1>
+  <p class="lede">
+    All the stuff you do in your job that isn't your actual job.
+  </p>
+
+  <div class="grid-row section">
+    <div class="column-half">
+      <div class="text">
+        <a href="{{ url_for('notes.list') }}">View my notes</a>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
