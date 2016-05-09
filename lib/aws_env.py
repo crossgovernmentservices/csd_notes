@@ -26,7 +26,7 @@ class AWSInstanceEnv(object):
         instance = reservations[0].instances[0]
 
         env = instance.tags['Environment']
-        self._table = '{}-credentials'.format(env)
+        self._table = 'notes-{}-credentials'.format(env)
         self._version = instance.tags['ConfigVersion']
         self._initialized = True
 
