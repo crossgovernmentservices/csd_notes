@@ -66,7 +66,11 @@ def oidc_callback(idp='dex'):
 
     login_user(user)
 
-    next_url = session.pop('next_url', url_for('base.index'))
+    next_url = url_for('base.index')
+
+    if 'next_url' in session:
+        next_url = session['next_url']
+        del session['next_url']
 
     return redirect(next_url)
 
