@@ -4,7 +4,6 @@ Application configuration
 """
 
 import os
-from os.path import dirname, join
 
 
 # get settings from environment, or credstash if running in AWS

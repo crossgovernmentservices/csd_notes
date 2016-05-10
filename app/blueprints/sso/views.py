@@ -3,10 +3,13 @@
 Single Sign-On views
 """
 
+from urllib.parse import urlparse, urlunparse
+
 from flask import (
     Blueprint,
     redirect,
     request,
+    session,
     url_for
 )
 from flask.ext.security.utils import login_user, logout_user
@@ -20,10 +23,27 @@ from app.extensions import (
 sso = Blueprint('sso', __name__)
 
 
+def sanitize_url(url):
+
+    if url:
+        parts = list(urlparse(url))
+        parts[0] = ''
+        parts[1] = ''
+        parts[3] = ''
+        url = urlunparse(parts[:6])
+
+    return url
+
+
 @sso.route('/login/<idp>')
 @sso.route('/login')
 def login(idp='dex'):
     "login redirects to Dex for SSO login/registration"
+
+    next_url = sanitize_url(request.args.get('next'))
+    if next_url:
+        session['next_url'] = next_url
+
     return redirect(oidc.login(idp))
 
 
@@ -46,10 +66,9 @@ def oidc_callback(idp='dex'):
 
     login_user(user)
 
-    if 'next' in request.args:
-        return redirect(request.args['next'])
+    next_url = session.pop('next_url', url_for('base.index'))
 
-    return redirect(url_for('base.index'))
+    return redirect(next_url)
 
 
 def create_user(user_info):
