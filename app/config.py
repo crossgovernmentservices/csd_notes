@@ -33,13 +33,17 @@ SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
 SQLALCHEMY_DATABASE_URI = env.get(
     'DATABASE_URL',
-    'sqlite:///{}'.format(join(dirname(__file__), '../development.db')))
+    'postgresql+psycopg2://localhost/notes')
 
 
 # XXX Don't change the following settings unless necessary
 
 # Skips concatenation of bundles if True, which breaks everything
 ASSETS_DEBUG = False
+
+ASSETS_LOAD_PATH = [
+    'app/static',
+    'app/templates']
 
 # Calculate friendly times using UTC instead of local timezone
 HUMANIZE_USE_UTC = True

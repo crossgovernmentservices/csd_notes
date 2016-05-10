@@ -3,7 +3,7 @@ bs4
 credstash
 cryptography
 flask
-flask-assets
+-e git://github.com/miracle2k/flask-assets.git#egg=flask-assets
 flask-humanize
 flask-mail
 flask-markdown
@@ -13,8 +13,10 @@ flask-security
 flask-sqlalchemy
 flask-wtf
 gunicorn
+jinja-to-js
 libsass
 markdown
+psycopg2
 pytest
 pytest-cov
 pytest-eradicate
@@ -25,3 +27,4 @@ pytest-splinter
 python-jose
 raven
 requests
+sqlalchemy-searchable

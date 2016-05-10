@@ -7,6 +7,7 @@ from flask.ext.security import RoleMixin, UserMixin
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from app.extensions import db
+from lib.model_utils import GetOr404Mixin, GetOrCreateMixin
 
 
 user_roles = db.Table(
@@ -21,7 +22,7 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, GetOrCreateMixin, GetOr404Mixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String)

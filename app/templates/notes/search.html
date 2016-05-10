@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block endhead %}
+  {% assets "css_notes" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+{% endblock %}
+
+{% block inside_header %}
+  <form class="search" method="get" action="{{ url_for('notes.search') }}">
+    <fieldset>
+      <input type="search" name="q" placeholder="Search"><button>Search</button>
+    </fieldset>
+  </form>
+{% endblock %}
+
+{% block body_content %}
+
+  <div class="test">
+    <a href="{{ url_for('notes.list') }}" class="link-back">Back to all notes</a>
+
+    <h1 class="heading-xlarge">
+      <span class="heading-secondary">Searching your notes</span>
+      <div class="editable search-term">{{ search_term }}</div>
+    </h1>
+  </div>
+
+  <section class="notes-main">
+    <p class="result-info">
+      <span class="result-count">{{ result_count }}</span>
+      notes matching <strong>{{ search_term }}</strong>
+    </p>
+  </section>
+
+  <ul class="notes-list">
+  {% for note in notes %}
+    {% include "notes/note.html" %}
+  {% endfor %}
+  </ul>
+
+  <div class="test">
+    <a class="more-link" href="#search-term">change search</a>
+  </div>
+
+{% endblock %}
+
+{% block body_end %}
+
+  {% assets "note_template", "js_notes" %}
+    <script src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+
+{% endblock %}

@@ -3,11 +3,9 @@
 Notes views
 """
 
-import datetime
-
 from flask import (
     Blueprint,
-    abort,
+    escape,
     jsonify,
     redirect,
     render_template,
@@ -16,7 +14,6 @@ from flask import (
 from flask_login import current_user
 from flask.ext.security import login_required
 from sqlalchemy import desc
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from app.blueprints.notes.email_tip import EmailTip
 from app.blueprints.notes.models import Note
@@ -25,30 +22,10 @@ from app.blueprints.notes.models import Note
 notes = Blueprint('notes', __name__)
 
 
-def two_mins_ago():
-    return datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
-
-
-@notes.context_processor
-def notes_context():
-    return {'undo_timeout': two_mins_ago}
-
-
-def get_or_404(class_, **kwargs):
-    try:
-        return class_.query.filter_by(**kwargs).one()
-
-    except NoResultFound:
-        abort(404)
-
-    except MultipleResultsFound:
-        raise
-
-
 @notes.route('/notes')
 @login_required
 def list():
-    notes = Note.query.filter(Note.author == current_user)
+    notes = Note.query.filter_by(author=current_user)
     notes = notes.order_by(desc(Note.updated)).all()
 
     email_tip = EmailTip()
@@ -63,7 +40,7 @@ def add():
     content = request.form.get('content', '').strip()
 
     if content:
-        Note.create(content, current_user)
+        Note.create(content=content, author=current_user)
 
     return redirect(url_for('.list'))
 
@@ -79,7 +56,7 @@ def dismiss_tip():
 @notes.route('/notes/<id>/undo', methods=['POST'])
 @login_required
 def undo(id):
-    note = get_or_404(Note, id=id, author=current_user)
+    note = Note.get_or_404(id=id, author=current_user)
 
     try:
         note.revert()
@@ -93,10 +70,9 @@ def undo(id):
 @notes.route('/notes/<id>/edit', methods=['POST'])
 @login_required
 def edit(id):
-    note = get_or_404(Note, id=id, author=current_user)
+    note = Note.get_or_404(id=id, author=current_user)
 
     note.update(request.form['content'])
-
     return redirect(url_for('.list'))
 
 
@@ -104,11 +80,17 @@ def edit(id):
 @login_required
 def search_json():
     term = request.args.get('q')
-    return jsonify({'results': [note.json for note in Note.search(term)]})
+    notes = Note.search(term).all()
+    return jsonify({'results': [note.json for note in notes]})
 
 
 @notes.route('/notes/search')
 @login_required
 def search():
-    term = request.args.get('q')
-    return render_template('notes/list.html', notes=Note.search(term))
+    term = escape(request.args.get('q'))
+    results = Note.search(term)
+    ctx = {
+        'notes': results.all(),
+        'search_term': term,
+        'result_count': results.count()}
+    return render_template('notes/search.html', **ctx)
