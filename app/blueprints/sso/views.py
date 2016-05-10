@@ -3,7 +3,7 @@
 Single Sign-On views
 """
 
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import unquote, urlparse, urlunparse
 
 from flask import (
     Blueprint,
@@ -40,7 +40,7 @@ def sanitize_url(url):
 def login(idp='dex'):
     "login redirects to Dex for SSO login/registration"
 
-    next_url = sanitize_url(request.args.get('next'))
+    next_url = sanitize_url(unquote(request.args.get('next', '')))
     if next_url:
         session['next_url'] = next_url
 

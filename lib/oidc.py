@@ -98,7 +98,7 @@ class OIDC(object):
             scope='openid email profile',
             response_type='code',
             client_id=config['client_id'],
-            redirect_uri=config.get('redirect_uri', self.callback_url))
+            redirect_uri=config.get('redirect_uri') or self.callback_url)
 
         return auth_request.url(config['authorization_endpoint'])
 
@@ -134,7 +134,7 @@ class OIDC(object):
         request = TokenRequest(
             grant_type='authorization_code',
             code=auth_code,
-            redirect_uri=config.get('redirect_uri', self.callback_url),
+            redirect_uri=config.get('redirect_uri') or self.callback_url,
             client_id=config['client_id'],
             secret=config['client_secret'])
 
