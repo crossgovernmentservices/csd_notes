@@ -9,6 +9,7 @@
 - Ruby 2.2.0 (for `govuk_template`)
 - PhantomJS (for UI testing)
 - Dex (see [Setting up Dex locally](#setting-up-dex-locally))
+- PostgreSQL 9.4
 
 
 ## Quickstart
@@ -23,9 +24,11 @@
 
 5. `python manage.py install_all_govuk_assets`
 
-6. `python manage.py db upgrade`
+6. `createdb notes`
 
-7. `python manage.py runserver`
+7. `python manage.py db upgrade`
+
+8. `python manage.py runserver`
 
 
 ## Tests

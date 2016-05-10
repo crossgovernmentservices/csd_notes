@@ -1,67 +1,71 @@
-import os
+import subprocess
 
-from flask.ext.migrate import upgrade
-import mock
 import pytest
+import sqlalchemy
 
 from app.blueprints.base.models import User
+from app.config import SQLALCHEMY_DATABASE_URI
+from app.extensions import db as _db
 from app.factory import create_app
 
 
-@pytest.fixture(scope='module')
+TEST_DATABASE_URI = SQLALCHEMY_DATABASE_URI + '_test'
+
+
+@pytest.yield_fixture(scope='session')
 def app(request):
-    test_db = os.path.join(os.path.dirname(__file__), '../test.db')
-    test_db_uri = 'sqlite:///{}'.format(test_db)
-    app = create_app(
-        TESTING=True,
-        TEST_DB_PATH=test_db,
-        SQLALCHEMY_DATABASE_URI=test_db_uri)
+    app = create_app(TESTING=True, SQLALCHEMY_DATABASE_URI=TEST_DATABASE_URI)
 
     ctx = app.app_context()
     ctx.push()
 
-    def teardown():
-        ctx.pop()
+    yield app
 
-    request.addfinalizer(teardown)
-    return app
+    ctx.pop()
 
 
-@pytest.fixture(scope='module')
-def db(app, request):
+def init_db(dbname, db):
+    sqlalchemy.orm.configure_mappers()
 
-    def remove_db():
-        if os.path.exists(app.config['TEST_DB_PATH']):
-            os.unlink(app.config['TEST_DB_PATH'])
+    try:
+        db.create_all()
 
-    remove_db()
-
-    # run migrations
-    upgrade()
-
-    request.addfinalizer(remove_db)
-
-    return app.extensions['sqlalchemy'].db
+    except sqlalchemy.exc.OperationalError as e:
+        if 'does not exist' in str(e):
+            create_db(dbname)
+            init_db(db)
 
 
-@pytest.fixture(scope='function')
+def create_db(dbname):
+    subprocess.call(['/usr/bin/env', 'createdb', dbname], timeout=1)
+
+
+@pytest.yield_fixture(scope='session')
+def db(request, app):
+    _db.app = app
+    _, dbname = TEST_DATABASE_URI.rsplit('/', 1)
+
+    _db.drop_all()
+    init_db(dbname, _db)
+
+    yield _db
+
+    _db.drop_all()
+
+
+@pytest.yield_fixture(scope='function')
 def db_session(db, request):
     connection = db.engine.connect()
     transaction = connection.begin()
 
-    options = {'bind': connection, 'binds': {}}
-    session = db.create_scoped_session(options=options)
+    session_factory = sqlalchemy.orm.sessionmaker(bind=connection)
+    db.session = session = sqlalchemy.orm.scoped_session(session_factory)
 
-    db.session = session
+    yield session
 
-    def teardown():
-        transaction.rollback()
-        connection.close()
-        session.remove()
-
-    request.addfinalizer(teardown)
-
-    return session
+    transaction.rollback()
+    connection.close()
+    session.remove()
 
 
 @pytest.fixture
@@ -72,11 +76,14 @@ def selenium(db, live_server, selenium):
 
 @pytest.fixture
 def test_user(db_session):
-    return User.get_or_create(email='test@example.com', full_name='Test Test')
+    user = User(email='test@example.com', full_name='Test Test', active=True)
+    db_session.add(user)
+    db_session.commit()
+    return user
 
 
 @pytest.yield_fixture
-def logged_in(client, test_user):
+def logged_in(test_user, client):
 
     with client.session_transaction() as session:
         session['user_id'] = test_user.id

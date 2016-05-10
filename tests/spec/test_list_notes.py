@@ -10,56 +10,73 @@ from app.blueprints.notes.models import Note
 
 
 @pytest.fixture
-def some_notes(db_session, test_user):
-    content = '*Test note {{}}*\n{}'.format(
-        'All work and no play makes Jack a dull boy\n' * 10)
-    return [Note.create(content.format(i), test_user) for i in range(1, 4)]
-
-
-@pytest.fixture
-def someone_elses_note(db_session):
-    other_user = User(email='test2@example.com', full_name='Test2 Test')
+def notes(db_session, test_user):
+    other_user = User(email='test2@example.com', full_name='Testy McTestface')
     db_session.add(other_user)
-    note = Note.create('This is not your note', other_user)
-    return note
+    db_session.commit()
+    content = 'This is not your note'
+    return (
+        [Note.create(content='*foo*', author=test_user) for i in range(3)] +
+        [Note.create(content=content, author=other_user) for i in range(3)])
 
 
 @pytest.fixture
-def response(client, logged_in):
+def list_response(client):
     return client.get(url_for('notes.list'))
 
 
-@pytest.fixture
-def soup(response):
-    return BeautifulSoup(response.get_data(as_text=True), 'html.parser')
+def cookies(response):
+    cookies = SimpleCookie()
+    for header in response.headers.getlist('Set-Cookie'):
+        cookies.load(header)
+    return cookies
 
 
 @pytest.fixture
-def seen_twice_already(client, logged_in):
+def list_cookies(list_response):
+    return cookies(list_response)
+
+
+@pytest.fixture
+def list_html(list_response):
+    return list_response.get_data(as_text=True)
+
+
+@pytest.fixture
+def list_soup(list_html):
+    return BeautifulSoup(list_html, 'html.parser')
+
+
+@pytest.fixture
+def seen_twice(client, logged_in):
     client.set_cookie('localhost', 'seen_email_tip', '2')
     response = client.get(url_for('notes.list'))
     return response
 
 
 @pytest.fixture
-def seen_twice_already_soup(seen_twice_already):
-    return BeautifulSoup(
-        seen_twice_already.get_data(as_text=True),
-        'html.parser')
+def seen_twice_soup(seen_twice):
+    return BeautifulSoup(seen_twice.get_data(as_text=True), 'html.parser')
 
 
 @pytest.fixture
-def dismiss_tip(client, logged_in):
-    return client.get(url_for('notes.dismiss_tip'))
+def dismiss_tip_cookies(client):
+    return cookies(client.get(url_for('notes.dismiss_tip')))
 
 
+@pytest.mark.usefixtures('logged_in', 'notes')
 class WhenViewingNotesListPage(object):
 
-    def it_shows_only_current_users_notes(self, someone_elses_note, response):
-        assert 'This is not your note' not in response.get_data(as_text=True)
+    def it_shows_a_list_of_notes(self, list_soup):
+        assert list_soup.find(class_='notes-list')
+        assert len(list_soup.find_all(class_='note')) > 1
 
-    def it_lists_notes_in_reverse_chronological_order(self, some_notes, soup):
-        notes = soup.find_all(class_='note')
+    def it_only_shows_notes_by_the_current_user(self, list_html, list_soup):
+        assert len(list_soup.find_all(class_='note')) == 3
+        assert 'This is not your note' not in list_html
+
+    def it_lists_notes_in_reverse_chronological_order(self, list_soup):
+        notes = list_soup.find_all(class_='note')
         assert len(notes) >= 3
 
         def timestamp(note):
@@ -68,36 +85,30 @@ class WhenViewingNotesListPage(object):
         assert timestamp(notes[0]) >= timestamp(notes[1])
         assert timestamp(notes[1]) >= timestamp(notes[2])
 
-    def it_renders_note_contents_as_markdown(self, some_notes, soup):
-        note = soup.find_all(class_='note')[0]
+    def it_renders_note_contents_as_markdown(self, list_soup):
+        note = list_soup.find_all(class_='note')[0]
         assert len(note.find_all('em')) > 0
 
-    def it_shows_only_first_250_chars_of_a_note(self, some_notes, soup):
-        notes = soup.find_all(class_='note')
+    def it_shows_only_first_250_chars_of_a_note(self, list_soup):
+        notes = list_soup.find_all(class_='note')
         for note in notes:
             assert len(Markup(note.find(itemprop='text')).striptags()) <= 250
 
-    def it_shows_the_email_tip(self, soup):
-        tip = soup.find(class_='message-box')
+    def it_shows_the_email_tip(self, list_soup):
+        tip = list_soup.find(class_='message-box')
         assert tip.find('a')['href'].startswith('mailto:')
 
-    def it_sets_a_cookie_if_it_has_not_been_seen_twice_already(self, response):
-        cookies = SimpleCookie()
-        for header in response.headers.getlist('Set-Cookie'):
-            cookies.load(header)
-        assert 'seen_email_tip' in cookies
-        assert int(cookies['seen_email_tip'].value) == 1
+    def it_sets_cookie_if_tip_not_seen_twice_already(self, list_cookies):
+        assert 'seen_email_tip' in list_cookies
+        assert int(list_cookies['seen_email_tip'].value) == 1
 
-    def it_hides_the_email_tip_if_it_has_been_seen_twice_already(
-            self, seen_twice_already_soup):
-        tip = seen_twice_already_soup.find(class_='message-box')
+    def it_hides_the_email_tip_if_seen_twice_already(self, seen_twice_soup):
+        tip = seen_twice_soup.find(class_='message-box')
         assert tip is None
 
 
 class WhenDismissingTheEmailTip(object):
 
-    def it_sets_a_cookie(self, dismiss_tip):
-        cookies = SimpleCookie()
-        cookies.load(dismiss_tip.headers.get('Set-Cookie'))
-        assert 'seen_email_tip' in cookies
-        assert int(cookies['seen_email_tip'].value) == 2
+    def it_sets_a_cookie(self, dismiss_tip_cookies):
+        assert 'seen_email_tip' in dismiss_tip_cookies
+        assert int(dismiss_tip_cookies['seen_email_tip'].value) == 2

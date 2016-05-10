@@ -96,6 +96,44 @@
   }
 }
 
+.notes-main {
+  margin: 0 auto $gutter;
+  max-width: 30em;
+  border-top: 1px solid $grey-3;
+}
+
+.notes-section {
+  margin: 0 auto;
+  max-width: 30em;
+  border-top: 1px solid $grey-3;
+}
+
+// Search results
+// ==========================================================================
+.result-info {
+  strong {
+    font-weight: bold;
+  }
+  margin-bottom: 0;
+}
+
+.result-count {
+  font-weight: bold;
+  font-size: 48px;
+}
+
+.search-term {
+  background: $focus-colour;
+  font-weight: 600;
+}
+
+.editable.search-term {
+  background: white;
+  margin: 0;
+  padding: 2px;
+  border: 0;
+}
+
 // Notes list, central
 // ==========================================================================
 .notes-list {
@@ -267,3 +305,32 @@
   }
 }
 
+.header-global .search {
+  float: right;
+  margin-top: 2px;
+
+  input {
+    border: 0;
+    padding: 4px 5px 2px;
+    vertical-align: bottom;
+    margin: 0 1px;
+    font-size: 16px;
+    font-family: nta, Arial, sans-serif;
+  }
+
+  button {
+    border: 0;
+    font-size: 16px;
+    margin: 1px 16px 0 0;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    background-color: #005ea5;
+    background-image: url(/static/images/search.png);
+    background-position: 7px 7px;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    text-indent: 100%;
+  }
+}

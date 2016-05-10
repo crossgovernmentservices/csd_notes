@@ -1,0 +1,22 @@
+<li class="note editOnClick" itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
+  <section class="text rendered-markdown rendered-note" itemprop="text">
+    {{ note.truncated }}
+  </section>
+  <section>
+    <form action="{{ note.edit_url }}" method="post" class="form note-form">
+      <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
+      <button class="button">Save</button>
+    </form>
+  </section>
+  {% if note.just_updated -%}
+  <form action="{{ note.undo_url }}" method="post" class="undo-link">
+    Just updated (<button>undo</button>)
+  </form>
+  {%- endif %}
+  <span class="note-date {%- if note.just_updated %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.timestamp }}">
+    {{ note.friendly_updated }}
+  </span>
+  {% if note.is_email %}
+  <div class="email-flag">Email</div>
+  {% endif %}
+</li>

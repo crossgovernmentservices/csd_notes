@@ -7,12 +7,15 @@ import os
 
 from flask.ext.assets import Bundle, Environment
 
+from lib.jinja_to_js_filter import JinjaToJs
 from lib.sass_filter import LibSass
 
 
 def static(*path):
     return os.path.join(os.path.dirname(__file__), 'static', *path)
 
+
+jinja_to_js = JinjaToJs()
 
 libsass_output = LibSass(include_paths=[
     static('sass'),
@@ -44,3 +47,14 @@ env.register('css_notes', Bundle(
     depends=[
         '/static/sass/notes/**/*.scss',
         '/static/govuk_frontend_toolkit/stylesheets/**/*.scss']))
+
+env.register('note_template', Bundle(
+    'notes/note.html',
+    filters=(jinja_to_js,),
+    output='javascript/templates/notes/note.js'))
+
+env.register('js_notes', Bundle(
+    'js/vendor/jinja-to-js-runtime.js',
+    'js/notesapp.js',
+    filters=('rjsmin',),
+    output='javascript/notes.js'))

@@ -33,6 +33,32 @@
     $el.on('click', edit);
   }
 
+  function editableSearchTerm() {
+    var $el = $(this);
+    var $input = $('<input class="hidden editable search-term">').insertAfter($el);
+
+    function edit() {
+      $el.addClass('hidden');
+      $input.removeClass('hidden');
+      $input.val($.trim($el.text()));
+      $input.focus().select();
+    }
+
+    function search() {
+      document.location.search = '?q=' + $(this).val();
+    }
+
+    function cancel() {
+      $el.removeClass('hidden');
+      $input.addClass('hidden');
+      $el.text($(this).val());
+    }
+
+    $el.on('click', edit);
+    $input.on('change', search);
+    $input.on('blur', cancel);
+  }
+
   $(function() {
     $('.editOnClick').each(editOnClick);
 
@@ -47,6 +73,8 @@
     $('.undo-link').on('click', function (event) {
       event.stopPropagation();
     });
+
+    $('.editable.search-term').each(editableSearchTerm);
   });
 
 }).call(this, jQuery, window);

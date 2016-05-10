@@ -6,8 +6,20 @@ Notes models
 import datetime
 
 from bs4 import BeautifulSoup
+from flask import current_app, url_for
+from flask.ext.sqlalchemy import BaseQuery
+from sqlalchemy_searchable import SearchQueryMixin, make_searchable
+from sqlalchemy_utils.types import TSVectorType
 
 from app.extensions import db
+from lib.model_utils import GetOr404Mixin, GetOrCreateMixin
+
+
+make_searchable()
+
+
+class NoteQuery(BaseQuery, SearchQueryMixin):
+    pass
 
 
 def sanitize(content):
@@ -17,7 +29,9 @@ def sanitize(content):
     return ''.join(text_nodes)
 
 
-class Note(db.Model):
+class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
+    query_class = NoteQuery
+
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
     created = db.Column(db.DateTime)
@@ -26,6 +40,7 @@ class Note(db.Model):
     history = db.relationship('NoteHistory', backref='note', cascade='delete')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship('User', backref='notes')
+    search_vector = db.Column(TSVectorType('content'))
 
     class VersionDoesNotExist(Exception):
 
@@ -71,6 +86,52 @@ class Note(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    @classmethod
+    def search(cls, term):
+        return Note.query.search(term, sort=True)
+
+    @property
+    def truncated(self):
+        markdown = current_app.jinja_env.filters['markdown']
+        truncate = current_app.jinja_env.filters['truncate_html']
+        return truncate(markdown(self.content), 250, end=" \u2026")
+
+    @property
+    def edit_url(self):
+        return url_for('notes.edit', id=self.id)
+
+    @property
+    def just_updated(self):
+        undo_timeout = (
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=2))
+        return bool(self.history and self.updated > undo_timeout)
+
+    @property
+    def undo_url(self):
+        return url_for('notes.undo', id=self.id)
+
+    @property
+    def timestamp(self):
+        return self.updated.strftime('%Y%m%d%H%M%S.%f')
+
+    @property
+    def friendly_updated(self):
+        humanize = current_app.jinja_env.filters['humanize']
+        return humanize(self.updated)
+
+    def json(self):
+        return {
+            'id': self.id,
+            'truncated': self.truncated,
+            'edit_url': self.edit_url,
+            'content': self.content,
+            'just_updated': self.just_updated,
+            'undo_url': self.undo_url,
+            'timestamp': self.timestamp,
+            'friendly_updated': self.friendly_updated,
+            'is_email': self.is_email
+        }
 
 
 class NoteHistory(db.Model):
