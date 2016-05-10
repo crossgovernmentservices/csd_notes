@@ -16,12 +16,13 @@ class KeyNotFound(Exception):
 
 def verify_id_token(token, config):
     header = jwt.get_unverified_header(token)
-    keys = [key for key in config['keys'] if key['kid'] == header['kid']]
+    keys = {key['kid']: key for key in config['keys']}
+    key = keys.get(header['kid'])
 
-    if len(keys) == 0:
+    if not key:
         raise KeyNotFound()
 
-    return jwt.decode(token, keys[0], audience=config['client_id'])
+    return jwt.decode(token, key, audience=config['client_id'])
 
 
 class OIDC(object):
@@ -64,29 +65,27 @@ class OIDC(object):
 
         config = self._config.get(provider_name, {})
 
-        if 'authorization_endpoint' not in config:
+        if config and 'authorization_endpoint' not in config:
 
-            config.update(requests.get(
+            self._config[provider_name].update(requests.get(
                 '{}/.well-known/openid-configuration'.format(
                     config['discovery_url'])).json())
 
-            self._config[provider_name] = config
-
-            self._fetch_keys(provider_name)
+            config = self.refresh_keys(provider_name)
 
         return config
 
-    def _fetch_keys(self, provider_name):
+    def refresh_keys(self, provider_name):
+        """
+        Load the JWKS keys from the provider
+        """
 
-        config = self._config.get(provider_name, {})
+        jwks_uri = self._config[provider_name].get('jwks_uri')
 
-        if 'jwks_uri' in config:
-            config.update(requests.get(
-                config['jwks_uri']).json())
+        if jwks_uri:
+            self._config[provider_name].update(requests.get(jwks_uri).json())
 
-            self._config[provider_name] = config
-
-        return config
+        return self._config[provider_name]
 
     def login(self, provider_name):
         """
@@ -120,7 +119,7 @@ class OIDC(object):
 
         except KeyNotFound:
             # refresh keys, in case they have been rotated
-            self._fetch_keys(provider_name)
+            config = self.refresh_keys(provider_name)
             claims = verify_id_token(token_response['id_token'], config)
 
         claims.update(self.userinfo(config, access_token))
