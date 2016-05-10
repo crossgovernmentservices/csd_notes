@@ -18,7 +18,8 @@ OIDC_PROVIDERS = {
     'dex': {
         'discovery_url': env.get('DEX_APP_DISCOVERY_URL'),
         'client_id': env.get('DEX_APP_CLIENT_ID'),
-        'client_secret': env.get('DEX_APP_CLIENT_SECRET')
+        'client_secret': env.get('DEX_APP_CLIENT_SECRET'),
+        'redirect_uri':env.get('DEX_APP_REDIRECT_URI')
     },
     'google': {
         'discovery_url': env.get('GOOGLE_APP_DISCOVERY_URL'),
