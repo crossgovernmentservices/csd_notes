@@ -17,26 +17,10 @@
 {% block body_content %}
 
   <div class="test">
-    <a href="{{ url_for('notes.list') }}" class="link-back">Back to all notes</a>
-
-    <h1 class="heading-xlarge">
-      <span class="heading-secondary">Searching your notes</span>
-      <div class="editable search-term">{{ search_term }}</div>
-    </h1>
+    <h1 class="heading-large">Edit your Note</h1>
   </div>
 
-  <section class="notes-main">
-    <p class="result-info">
-      <span class="result-count">{{ result_count }}</span>
-      notes matching <strong>{{ search_term }}</strong>
-    </p>
-  </section>
-
-  {% include "partial/notes_list.html" %}
-
-  <div class="test">
-    <a class="more-link" href="#search-term">change search</a>
-  </div>
+  {% include "partial/edit_note_form.html" %}
 
 {% endblock %}
 
