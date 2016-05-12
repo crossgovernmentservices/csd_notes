@@ -67,10 +67,13 @@ def undo(id):
     return redirect(url_for('.list'))
 
 
-@notes.route('/notes/<id>/edit', methods=['POST'])
+@notes.route('/notes/<id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(id):
     note = Note.get_or_404(id=id, author=current_user)
+
+    if request.method == 'GET':
+        return render_template('notes/edit.html', note=note)
 
     note.update(request.form['content'])
     return redirect(url_for('.list'))

@@ -1,7 +1,10 @@
-<li class="note editOnClick" itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
+<div itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
   <section class="text rendered-markdown rendered-note" itemprop="text">
     {{ note.truncated }}
   </section>
+  <noscript>
+    <a href="{{ note.edit_url }}" class="edit-link">Edit</a>
+  </noscript>
   <section>
     <form action="{{ note.edit_url }}" method="post" class="form note-form">
       <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
@@ -19,4 +22,4 @@
   {% if note.is_email %}
   <div class="email-flag">Email</div>
   {% endif %}
-</li>
+</div>
