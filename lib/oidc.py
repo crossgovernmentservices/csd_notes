@@ -16,7 +16,7 @@ class KeyNotFound(Exception):
 
 def verify_id_token(token, config):
     header = jwt.get_unverified_header(token)
-    keys = {key['kid']: key for key in config['keys']}
+    keys = {key['kid']: key for key in config.get('keys', [])}
     key = keys.get(header['kid'])
 
     if not key:
