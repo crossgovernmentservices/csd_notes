@@ -35,16 +35,15 @@ def sanitize_url(url):
     return url
 
 
-@sso.route('/login/<idp>')
 @sso.route('/login')
-def login(idp='dex'):
+def login():
     "login redirects to Dex for SSO login/registration"
 
     next_url = sanitize_url(unquote(request.args.get('next', '')))
     if next_url:
         session['next_url'] = next_url
 
-    return redirect(oidc.login(idp))
+    return redirect(oidc.login('dex'))
 
 
 @sso.route('/logout')
@@ -53,11 +52,10 @@ def logout():
     return redirect(url_for('base.index'))
 
 
-@sso.route('/auth/<idp>/callback')
 @sso.route('/callback')
 @oidc.callback
-def oidc_callback(idp='dex'):
-    user_info = oidc.authenticate(idp, request)
+def oidc_callback():
+    user_info = oidc.authenticate('dex', request)
 
     user = user_datastore.get_user(user_info['email'])
 
