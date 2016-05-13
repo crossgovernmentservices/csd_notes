@@ -31,9 +31,13 @@ OIDC_PROVIDERS = {
 
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
-SQLALCHEMY_DATABASE_URI = env.get(
-    'DATABASE_URL',
-    'postgresql+psycopg2://localhost/notes')
+if all([env.get('DB_HOST'), env.get('DB_PORT'), env.get('DB_USERNAME'),
+        env.get('DB_PASSWORD')]):
+    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://{}:{}@{}:{}/notes".format(
+        env.get('DB_USERNAME'), env.get('DB_PASSWORD'), env.get('DB_HOST'))
+else:
+    SQLALCHEMY_DATABASE_URI = env.get('DATABASE_URL',
+                                      'postgresql+psycopg2://localhost/notes')
 
 
 # XXX Don't change the following settings unless necessary
