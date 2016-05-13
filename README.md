@@ -78,9 +78,17 @@ which fetches values from the environment.
   possibly other encrypted data. The default changes on server restart, so
   sessions will be lost unless a constant value is used</dd>
 
-  <dt><code>DATABASE_URL</code></dt>
-  <dd>(default: <code>sqlite:///development.db</code>) The URL for the database.
-  This can include a username and password</dd>
+  <dt><code>DB_USERNAME</code></dt>
+  <dd>(default: None) The username for the database</dd>
+
+  <dt><code>DB_PASSWORD</code></dt>
+  <dd>(default: None) The password for the database</dd>
+
+  <dt><code>DB_HOST</code></dt>
+  <dd>(default: `localhost`) The database hostname</dd>
+
+  <dt><code>DB_PORT</code></dt>
+  <dd>(default: None) The database port number</dd>
 </dl>
 
 
