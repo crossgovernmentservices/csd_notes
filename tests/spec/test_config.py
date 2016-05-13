@@ -8,7 +8,14 @@ from app.factory import create_app
 @pytest.yield_fixture
 def credstash():
     with patch('lib.aws_env.env.__getitem__') as get:
-        get.return_value = 'fetched from credstash'
+
+        def mock_credstash(key):
+            if key == 'DB_HOST':
+                return None  # otherwise db gets confused
+
+            return 'fetched from credstash'
+
+        get.side_effect = mock_credstash
         yield
 
 

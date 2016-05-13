@@ -12,6 +12,13 @@ if env.get('SETTINGS') == 'AWS':
     from lib.aws_env import env
 
 
+DB = {
+    'user': env.get('DB_USERNAME'),
+    'pass': env.get('DB_PASSWORD'),
+    'host': env.get('DB_HOST'),
+    'port': env.get('DB_PORT')
+}
+
 DEBUG = bool(env.get('DEBUG', True))
 
 OIDC_PROVIDERS = {
@@ -31,14 +38,10 @@ OIDC_PROVIDERS = {
 
 SECRET_KEY = env.get('SECRET_KEY', os.urandom(24))
 
-if all([env.get('DB_HOST'), env.get('DB_PORT'), env.get('DB_USERNAME'),
-        env.get('DB_PASSWORD')]):
-    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://{}:{}@{}:{}/notes".format(
-        env.get('DB_USERNAME'), env.get('DB_PASSWORD'), env.get('DB_HOST'),
-        env.get('DB_PORT'))
-else:
-    SQLALCHEMY_DATABASE_URI = env.get('DATABASE_URL',
-                                      'postgresql+psycopg2://localhost/notes')
+SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/notes'
+if all(DB.values()):
+    SQLALCHEMY_DATABASE_URI = (
+        'postgresql://{user}:{pass}@{host}:{port}/notes'.format(**DB))
 
 
 # XXX Don't change the following settings unless necessary
