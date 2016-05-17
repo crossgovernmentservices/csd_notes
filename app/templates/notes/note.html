@@ -1,8 +1,7 @@
 <div itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
-  <button class="close-btn">close</button>
 
   <section class="text rendered-markdown rendered-note" itemprop="text">
-    {{ note.truncated }}
+    {{ note.rendered }}
   </section>
 
   <section class="note-edit-controls">
@@ -14,6 +13,7 @@
     <form action="{{ note.edit_url }}" method="post" class="form note-form">
       <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
       <button class="button">Save</button>
+      <input class="cancel button" type="reset" value="Cancel">
       <div><input type="text" placeholder="add extra tags &hellip;" name="tags"></div>
     </form>
 

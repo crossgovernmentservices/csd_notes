@@ -285,12 +285,22 @@
     outline: none;
   }
 
-  button {
+  .button {
     margin-top: 15px;
     margin-bottom: 0;
     box-shadow: none;
     padding: 8px 10px 5px;
     border-radius: 2px;
+  }
+
+  .cancel {
+    background-color: $grey-3;
+    color: $black;
+
+    &:hover,
+    &:active {
+      background-color: $grey-2;
+    }
   }
 
   .close-btn {

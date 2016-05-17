@@ -39,6 +39,7 @@
       event.stopPropagation();
     });
     $el.find('.close-btn').on('click', deactivate);
+    $el.find('.cancel').on('click', deactivate);
     $el.on('click', edit);
   }
 

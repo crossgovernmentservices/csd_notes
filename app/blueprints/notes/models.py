@@ -110,10 +110,14 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
         return Note.query.search(term, sort=True)
 
     @property
-    def truncated(self):
+    def rendered(self):
         markdown = current_app.jinja_env.filters['markdown']
+        return markdown(self.content)
+
+    @property
+    def truncated(self):
         truncate = current_app.jinja_env.filters['truncate_html']
-        return truncate(markdown(self.content), 250, end=" \u2026")
+        return truncate(self.rendered, 250, end=" \u2026")
 
     @property
     def edit_url(self):
