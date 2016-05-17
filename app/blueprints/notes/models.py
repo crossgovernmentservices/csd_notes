@@ -29,6 +29,12 @@ def sanitize(content):
     return ''.join(text_nodes)
 
 
+tags = db.Table(
+    'note_tag',
+    db.Column('tag.id', db.Integer, db.ForeignKey('tag.id')),
+    db.Column('note.id', db.Integer, db.ForeignKey('note.id')))
+
+
 class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
     query_class = NoteQuery
 
@@ -41,6 +47,7 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship('User', backref='notes')
     search_vector = db.Column(TSVectorType('content'))
+    tags = db.relationship('Tag', backref='notes', secondary=tags)
 
     class VersionDoesNotExist(Exception):
 
@@ -87,6 +94,17 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
         db.session.delete(self)
         db.session.commit()
 
+    def add_tag(self, tag_name):
+        if not self.has_tag(tag_name):
+            self.tags.append(Tag(name=sanitize(tag_name)))
+            db.session.add(self)
+            db.session.commit()
+
+    def has_tag(self, tag_name):
+        return Note.query.join(tags).filter(
+            Note.id == self.id,
+            Tag.name == tag_name).count() > 0
+
     @classmethod
     def search(cls, term):
         return Note.query.search(term, sort=True)
@@ -130,7 +148,10 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
             'undo_url': self.undo_url,
             'timestamp': self.timestamp,
             'friendly_updated': self.friendly_updated,
-            'is_email': self.is_email
+            'is_email': self.is_email,
+            'tags': [{
+                'name': tag.name,
+                'url': tag.url} for tag in self.tags]
         }
 
 
@@ -149,3 +170,14 @@ class NoteHistory(db.Model):
         versions = [rev.version for rev in note.history]
         if versions:
             self.version = max(0, *versions) + 1
+
+
+class Tag(db.Model, GetOr404Mixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author = db.relationship('User', backref='tags')
+
+    @property
+    def url(self):
+        return url_for('notes.by_tag', tag=self.name)

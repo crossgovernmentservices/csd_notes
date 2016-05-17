@@ -24,8 +24,10 @@
   </div>
 
   <form action="{{ url_for('notes.add') }}" method="post" class="form note-form add-note-form editOnClick">
+    <button class="close-btn">close</button>
     <textarea name="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;"></textarea>
     <button class="button">Save</button>
+    <div><input name="tags" type="text" placeholder="add tags &hellip;"></div>
   </form>
 
   {% include "partial/notes_list.html" %}

@@ -1,4 +1,12 @@
 <form action="{{ note.edit_url }}" method="post" class="form note-form add-note-form active">
   <textarea name="content" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
   <button class="button">Save</button>
+  <input type="text" placeholder="add extra tags &hellip;" name="tags">
+  <section class="tag-list">
+    <ul>
+      {% for tag in note.tags %}
+      <li class="note-tag">{{ tag.name }}</li>
+      {% endfor %}
+    </ul>
+  </section>
 </form>

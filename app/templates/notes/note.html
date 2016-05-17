@@ -1,25 +1,48 @@
 <div itemscope itemtype="http://schema.org/CreativeWork" data-id="{{ note.id }}">
+  <button class="close-btn">close</button>
+
   <section class="text rendered-markdown rendered-note" itemprop="text">
     {{ note.truncated }}
   </section>
-  <noscript>
-    <a href="{{ note.edit_url }}" class="edit-link">Edit</a>
-  </noscript>
-  <section>
+
+  <section class="note-edit-controls">
+
+    <noscript>
+      <a href="{{ note.edit_url }}" class="edit-link">Edit</a>
+    </noscript>
+
     <form action="{{ note.edit_url }}" method="post" class="form note-form">
       <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
       <button class="button">Save</button>
+      <div><input type="text" placeholder="add extra tags &hellip;" name="tags"></div>
     </form>
+
   </section>
-  {% if note.just_updated -%}
-  <form action="{{ note.undo_url }}" method="post" class="undo-link">
-    Just updated (<button>undo</button>)
-  </form>
-  {%- endif %}
-  <span class="note-date {%- if note.just_updated %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.timestamp }}">
-    {{ note.friendly_updated }}
-  </span>
-  {% if note.is_email %}
-  <div class="email-flag">Email</div>
-  {% endif %}
+
+  <section class="note-meta">
+
+    <span class="note-date {%- if note.just_updated %} hidden{% endif %}" itemprop="dateModified" data-timestamp="{{ note.timestamp }}">
+      {{ note.friendly_updated }}
+    </span>
+
+    {% if note.just_updated -%}
+    <form action="{{ note.undo_url }}" method="post" class="undo-link">
+      Just updated (<button>undo</button>)
+    </form>
+    {%- endif %}
+
+    {% if note.is_email %}
+    <div class="email-flag">Email</div>
+    {% endif %}
+
+  </section>
+
+  <section class="tag-list">
+    <ul>
+      {% for tag in note.tags %}
+      <li class="note-tag"><a href="{{ tag.url }}">{{ tag.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+
 </div>
