@@ -19,17 +19,26 @@
   function editOnClick() {
     var $el = $(this);
 
-    function activate() {
+    function deactivate(event) {
+      event.stopPropagation();
       $('.editOnClick.active.edit-mode').removeClass('active edit-mode');
+    }
+
+    function activate(event) {
+      deactivate(event);
       $el.addClass('active edit-mode');
     }
 
-    function edit() {
-      activate();
+    function edit(event) {
+      activate(event);
       $el.find('textarea').focus();
     }
 
     $el.find('textarea').on('keydown', activate);
+    $el.find('input[name="tags"]').on('click', function (event) {
+      event.stopPropagation();
+    });
+    $el.find('.close-btn').on('click', deactivate);
     $el.on('click', edit);
   }
 

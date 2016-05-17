@@ -86,6 +86,8 @@
 // Notes
 // ==========================================================================
 .note {
+  position: relative;
+
   &:hover {
     cursor: pointer;
 
@@ -243,10 +245,15 @@
     border-radius: 2px;
     display: inline-block;
   }
+
 }
 
 .js-enabled .add-note-form {
   button {
+    display: none;
+  }
+
+  input[name="tags"] {
     display: none;
   }
 
@@ -255,10 +262,17 @@
     button {
       display: inline-block;
     }
+
+    input[name="tags"] {
+      display: inline-block;
+      outline: none;
+      margin-top: 5px;
+    }
   }
 }
 
 .note-form {
+  position: relative;
   box-sizing: border-box;
 
   textarea {
@@ -278,6 +292,17 @@
     padding: 8px 10px 5px;
     border-radius: 2px;
   }
+
+  .close-btn {
+    margin-top: 0;
+    padding: 7px 5px 4px;
+    border-radius: 0;
+  }
+
+  input[name="tags"] {
+    outline: none;
+    margin-top: 5px;
+  }
 }
 
 .note {
@@ -290,6 +315,18 @@
   }
 }
 
+.close-btn {
+  display: none;
+  position: absolute;
+  padding: 7px 5px 4px;
+  border: 1px solid $grey-2;
+  background: $white;
+  right: -1px;
+  top: -1px;
+  font-size: 16px;
+  line-height: 1em;
+}
+
 .js-enabled {
 
   .note.edit-mode {
@@ -299,6 +336,9 @@
     }
     .rendered-note {
       display: none;
+    }
+    .close-btn {
+      display: inline-block;
     }
   }
   .note.undo-mode {
@@ -341,5 +381,55 @@
     background-repeat: no-repeat;
     background-size: 50%;
     text-indent: 100%;
+  }
+}
+
+.note-meta, .note .tag-list {
+  text-align: right;
+}
+
+.tag-list {
+  margin-bottom: 5px;
+}
+
+.note-tag {
+  position: relative;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 2px solid $black;
+  padding: 3px 3px 0;
+  margin-right: 5px;
+  margin-bottom: 3px;
+
+  a {
+    color: $black;
+    text-decoration: none;
+  }
+
+  .tag-quantity {
+    position: absolute;
+    display: inline-block;
+    background: $black;
+    color: $white;
+    padding: 0 3px 0 5px;
+    height: 23px;
+    line-height: 23px;
+    right: 0;
+    top: 0;
+  }
+}
+
+.note-tag--count {
+  padding-right: 19px;
+}
+
+.js-enabled .note.edit-mode {
+
+  .rendered-note,
+  .note-date,
+  .undo-link {
+    display: none;
   }
 }

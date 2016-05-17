@@ -16,7 +16,7 @@ from flask.ext.security import login_required
 from sqlalchemy import desc
 
 from app.blueprints.notes.email_tip import EmailTip
-from app.blueprints.notes.models import Note
+from app.blueprints.notes.models import Note, Tag
 
 
 notes = Blueprint('notes', __name__)
@@ -34,13 +34,26 @@ def list():
     return render_template('notes/list.html', notes=notes)
 
 
+@notes.route('/notes/tag/<tag>')
+@login_required
+def by_tag(tag):
+    tag = Tag.get_or_404(author=current_user, name=tag)
+    notes = tag.notes.order_by(desc(Note.updated)).all()
+
+    return render_template('notes/list.html', notes=notes)
+
+
 @notes.route('/notes', methods=['POST'])
 @login_required
 def add():
     content = request.form.get('content', '').strip()
+    tags = request.form.get('tags', '').split(',')
 
     if content:
-        Note.create(content=content, author=current_user)
+        note = Note.create(content=content, author=current_user)
+
+        for tag in tags:
+            note.add_tag(tag.strip())
 
     return redirect(url_for('.list'))
 
@@ -76,6 +89,11 @@ def edit(id):
         return render_template('notes/edit.html', note=note)
 
     note.update(request.form['content'])
+
+    tags = request.form.get('tags', '').split(',')
+    for tag in tags:
+        note.add_tag(tag.strip())
+
     return redirect(url_for('.list'))
 
 
