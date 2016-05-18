@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 import pytest
 
-from app.blueprints.notes.models import Note
+from app.blueprints.notes.models import Note, Tag
 
 
 @pytest.fixture
@@ -44,6 +44,18 @@ def after_update(client, logged_in, tagged_note):
     return BeautifulSoup(html, 'html.parser')
 
 
+@pytest.fixture
+def tags(db_session, test_user):
+
+    def make_tag(name):
+        tag = Tag(name=name, author=test_user)
+        db_session.add(tag)
+        db_session.commit()
+        return tag
+
+    return list(map(make_tag, ['foo', 'foobar', 'bar', 'baz', 'quux']))
+
+
 class WhenViewingANote(object):
 
     def it_has_a_list_of_tags(self, tagged_note):
@@ -81,3 +93,26 @@ class WhenUpdatingANote(object):
 
         tags = after_update.find(class_='tag-list').find_all('li')
         assert len(tags) == 4
+
+
+class WhenSearchingForATag(object):
+
+    def it_suggests_tags_that_start_with_the_specified_string(self, tags):
+        names = [tag.name for tag in Tag.suggest('f')]
+        assert len(names) == 2
+        assert 'foo' in names
+        assert 'foobar' in names
+
+    def it_suggests_matching_competency_tags(self, tags):
+        names = [tag.name for tag in Tag.suggest('')]
+        assert len(names) >= 15
+        assert 'Delivering Value for Money' in names
+        assert 'Seeing the Big Picture' in names
+        assert 'Changing and Improving' in names
+        assert 'Making Effective Decisions' in names
+        assert 'Leading and Communicating' in names
+        assert 'Collaborating and Partnering' in names
+        assert 'Building Capability for All' in names
+        assert 'Achieving Commercial Outcomes' in names
+        assert 'Managing a Quality Service' in names
+        assert 'Delivering at Pace' in names

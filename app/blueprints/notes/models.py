@@ -179,8 +179,14 @@ class NoteHistory(db.Model):
 class Tag(db.Model, GetOr404Mixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    namespace = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship('User', backref='tags')
+
+    @classmethod
+    def suggest(cls, term):
+        matches = Tag.query.filter(Tag.name.startswith(term))
+        return matches.all()
 
     @property
     def url(self):
