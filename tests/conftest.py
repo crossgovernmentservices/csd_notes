@@ -25,13 +25,24 @@ def app(request):
     ctx.pop()
 
 
-def teardown_db(db):
-    db.drop_all()
+def reset_migrations(db):
 
     # reset migrations, otherwise they will not be reapplied
     conn = db.engine.connect()
-    conn.execute('DELETE FROM alembic_version')
-    conn.close()
+
+    try:
+        conn.execute('DELETE FROM alembic_version')
+
+    except sqlalchemy.exc.ProgrammingError:
+        pass
+
+    finally:
+        conn.close()
+
+
+def teardown_db(db):
+    db.drop_all()
+    reset_migrations(db)
 
 
 def init_db(dbname, db):
