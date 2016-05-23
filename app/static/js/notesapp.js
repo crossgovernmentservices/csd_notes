@@ -69,10 +69,35 @@
     $input.on('blur', cancel);
   }
 
+  function tagInput() {
+    var $el = $(this);
+    $el.parents('section').siblings('.tag-list').find('.note-tag').each(function () {
+      var $tag = $(this);
+
+      function removeTag(event) {
+        event.preventDefault();
+        console.log('remove tag', $tag.find('a').first().text());
+      }
+
+      function selectTag(event) {
+        event.preventDefault();
+        console.log('select tag', $tag.find('a').first().text());
+      }
+
+      var $removeBtn = $('<a class="removeTag">×</a>');
+      $tag.append($removeBtn);
+      $removeBtn.on('click', removeTag);
+      $tag.find('a').first().on('click', selectTag);
+      $el.prepend($tag);
+    });
+  }
+
   $(function() {
     $('.editOnClick').each(editOnClick);
 
     $('.expandToFitContent').each(expandToFitContent);
+
+    $('.tag-input').each(tagInput);
 
     $('.add-note-form').find('textarea').focus();
 

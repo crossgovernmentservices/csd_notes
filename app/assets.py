@@ -56,5 +56,6 @@ env.register('note_template', Bundle(
 env.register('js_notes', Bundle(
     'js/vendor/jinja-to-js-runtime.js',
     'js/notesapp.js',
+    'js/incremental-search.js',
     filters=('rjsmin',),
     output='javascript/notes.js'))

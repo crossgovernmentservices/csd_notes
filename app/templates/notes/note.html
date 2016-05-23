@@ -14,7 +14,7 @@
       <textarea name="content" id="content" class="expandToFitContent" rows="1" placeholder="Write a note &hellip;">{{ note.content }}</textarea>
       <button class="button">Save</button>
       <input class="cancel button" type="reset" value="Cancel">
-      <div><input type="text" placeholder="add extra tags &hellip;" name="tags"></div>
+      <div class="tag-input"><input type="text" autocomplete="off" placeholder="add extra tags &hellip;" name="tags" class="incremental-search" data-search-url="{{ note.tag_search_url }}"></div>
     </form>
 
   </section>

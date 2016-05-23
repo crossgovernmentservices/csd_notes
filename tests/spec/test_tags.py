@@ -58,7 +58,7 @@ def tags(db_session, test_user):
 
 class WhenViewingANote(object):
 
-    def it_has_a_list_of_tags(self, tagged_note):
+    def it_has_a_list_of_tags(self, logged_in, tagged_note):
         assert len(tagged_note.tags) == 2
         assert tagged_note.has_tag('foo')
         assert tagged_note.has_tag('bar')
@@ -97,14 +97,15 @@ class WhenUpdatingANote(object):
 
 class WhenSearchingForATag(object):
 
-    def it_suggests_tags_that_start_with_the_specified_string(self, tags):
-        names = [tag.name for tag in Tag.suggest('f')]
-        assert len(names) == 2
+    def it_suggests_tags_that_start_with_the_specified_string(
+            self, tags, test_user):
+        names = [tag.name for tag in Tag.suggest('f', test_user)]
+        assert len(names) == 5
         assert 'foo' in names
         assert 'foobar' in names
 
-    def it_suggests_matching_competency_tags(self, tags):
-        names = [tag.name for tag in Tag.suggest('')]
+    def it_suggests_matching_competency_tags(self, tags, test_user):
+        names = [tag.name for tag in Tag.suggest('', test_user)]
         assert len(names) >= 15
         assert 'Delivering Value for Money' in names
         assert 'Seeing the Big Picture' in names

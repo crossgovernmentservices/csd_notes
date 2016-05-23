@@ -43,6 +43,14 @@ def by_tag(tag):
     return render_template('notes/list.html', notes=notes)
 
 
+@notes.route('/notes/tags.json')
+@login_required
+def tag_search():
+    term = request.args.get('q', '').strip()
+    tags = Tag.suggest(term, current_user)
+    return jsonify({'results': [tag.json for tag in tags]})
+
+
 @notes.route('/notes', methods=['POST'])
 @login_required
 def add():
@@ -101,7 +109,7 @@ def edit(id):
 @login_required
 def search_json():
     term = request.args.get('q')
-    notes = Note.search(term).all()
+    notes = Note.search(term, current_user).all()
     return jsonify({'results': [note.json for note in notes]})
 
 
@@ -109,7 +117,7 @@ def search_json():
 @login_required
 def search():
     term = escape(request.args.get('q'))
-    results = Note.search(term)
+    results = Note.search(term, current_user)
     ctx = {
         'notes': results.all(),
         'search_term': term,

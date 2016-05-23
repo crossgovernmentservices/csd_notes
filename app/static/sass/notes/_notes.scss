@@ -266,7 +266,7 @@
     input[name="tags"] {
       display: inline-block;
       outline: none;
-      margin-top: 5px;
+      border: none;
     }
   }
 }
@@ -312,6 +312,48 @@
   input[name="tags"] {
     outline: none;
     margin-top: 5px;
+  }
+}
+
+.tag-input {
+  border: 1px solid $grey-3;
+  padding: 3px 3px 0;
+  margin: 5px 0;
+
+  input[name="tags"] {
+    border: none;
+    margin: 0;
+  }
+
+  ul {
+    display: inline-block;
+    margin: 0 3px 0 0;
+  }
+
+  .note-tag {
+    border: 1px solid $grey-3;
+    padding: 0;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+
+    a {
+      display: inline-block;
+      padding: 0 0 0 3px;
+    }
+
+    .removeTag {
+      content: '×';
+      background: $grey-3;
+      color: $white;
+      display: inline-block;
+      padding: 4px 4px 2px 5px;
+      position: relative;
+      top: 0;
+      right: 0;
+      cursor: pointer;
+      margin-left: 3px;
+    }
   }
 }
 

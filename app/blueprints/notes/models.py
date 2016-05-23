@@ -8,6 +8,7 @@ import datetime
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
 from flask.ext.sqlalchemy import BaseQuery
+from sqlalchemy import or_
 from sqlalchemy_searchable import SearchQueryMixin, make_searchable
 from sqlalchemy_utils.types import TSVectorType
 
@@ -96,18 +97,20 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
 
     def add_tag(self, tag_name):
         if not self.has_tag(tag_name):
-            self.tags.append(Tag(name=sanitize(tag_name)))
+            self.tags.append(Tag(name=sanitize(tag_name), author=self.author))
             db.session.add(self)
             db.session.commit()
 
     def has_tag(self, tag_name):
         return Note.query.join(tags).filter(
             Note.id == self.id,
+            Tag.author == self.author,
             Tag.name == tag_name).count() > 0
 
     @classmethod
-    def search(cls, term):
-        return Note.query.search(term, sort=True)
+    def search(cls, term, user):
+        return Note.query.filter(Note.author == user).search(
+            term, sort=True)
 
     @property
     def rendered(self):
@@ -141,6 +144,10 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
     def friendly_updated(self):
         humanize = current_app.jinja_env.filters['humanize']
         return humanize(self.updated)
+
+    @property
+    def tag_search_url(self):
+        return url_for('notes.tag_search')
 
     def json(self):
         return {
@@ -184,10 +191,24 @@ class Tag(db.Model, GetOr404Mixin):
     author = db.relationship('User', backref='tags')
 
     @classmethod
-    def suggest(cls, term):
-        matches = Tag.query.filter(Tag.name.startswith(term))
+    def suggest(cls, term, user):
+        matches = Tag.query.filter(
+            or_(
+                Tag.author == user,
+                Tag.author == None),  # noqa
+            Tag.name.contains(term))
         return matches.all()
 
     @property
     def url(self):
         return url_for('notes.by_tag', tag=self.name)
+
+    @property
+    def json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'namespace': self.namespace,
+            'user_id': self.user_id,
+            'url': self.url
+        }
