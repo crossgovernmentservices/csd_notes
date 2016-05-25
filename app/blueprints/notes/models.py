@@ -107,6 +107,13 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
             Tag.author == self.author,
             Tag.name == tag_name).count() > 0
 
+    def remove_tag(self, tag_name):
+        if self.has_tag(tag_name):
+            tag = [tag for tag in self.tags if tag.name == tag_name]
+            self.tags.remove(tag[0])
+            db.session.add(self)
+            db.session.commit()
+
     @classmethod
     def search(cls, term, user):
         return Note.query.filter(Note.author == user).search(

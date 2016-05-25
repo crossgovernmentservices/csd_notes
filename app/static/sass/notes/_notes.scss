@@ -320,7 +320,7 @@
   padding: 3px 3px 0;
   margin: 5px 0;
 
-  input[name="tags"] {
+  input[type=text] {
     border: none;
     margin: 0;
   }
@@ -354,6 +354,10 @@
       cursor: pointer;
       margin-left: 3px;
     }
+  }
+
+  .search {
+    display: inline-block;
   }
 }
 
@@ -444,6 +448,10 @@
   margin-bottom: 5px;
 }
 
+.edit-mode .tag-list {
+  display: none;
+}
+
 .note-tag {
   position: relative;
   display: inline-block;
@@ -483,5 +491,28 @@
   .note-date,
   .undo-link {
     display: none;
+  }
+}
+
+.incremental-search-results {
+  display: none;
+  position: absolute;
+  background: $white;
+  z-index: 999;
+  border: 1px solid $grey-2;
+  padding: 2px 2px 0;
+  box-shadow: 2px 2px 3px -1px $grey-2;
+
+  li {
+    cursor: pointer;
+
+    &:hover {
+      background: $link-hover-colour;
+      color: $white;
+    }
+  }
+
+  b {
+    font-weight: bold;
   }
 }

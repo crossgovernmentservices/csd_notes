@@ -71,24 +71,75 @@
 
   function tagInput() {
     var $el = $(this);
-    $el.parents('section').siblings('.tag-list').find('.note-tag').each(function () {
-      var $tag = $(this);
+    var $tags = $el.parents('section').siblings('.tag-list').find('.note-tag').clone();
+    var $taglist = $('<ul>');
+    var $input = $el.find('input[type=text]');
+    var $searchBox = $input.clone();
+    $searchBox.removeAttr('name');
+    $searchBox.on('click', function (event) { event.stopPropagation(); });
+    $input.removeClass('incremental-search');
+    $input.hide();
+    $input.val('');
+    var $searchItem = $('<li class="search">');
+    $searchItem.append($searchBox);
+    $taglist.append($searchItem);
+    $el.append($taglist);
 
-      function removeTag(event) {
-        event.preventDefault();
-        console.log('remove tag', $tag.find('a').first().text());
+    function makeTag(tagName) {
+      var $tag = $('<li class="note-tag"/>');
+      var $link = $('<a href="/notes/tag/' + tagName + '">' + tagName + '</a>');
+      $tag.append($link);
+      addRemoveBtn($tag);
+      return $tag;
+    }
+
+    function addRemoveBtn($tag) {
+      var $removeBtn = $('<a class="removeTag">×</a>');
+      $tag.append($removeBtn);
+      $removeBtn.on('click', removeTag);
+      return $tag;
+    }
+
+    function appendTag($tag) {
+      $tag.insertBefore($searchItem);
+      var tagName = $tag.text().slice(0, -1);
+      var tags = $input.val();
+      tags += (tags.length ? ',' : '') + tagName;
+      $input.val(tags);
+    }
+
+    function removeTag(event) {
+      event.preventDefault();
+      var $tag = $(event.target).parent();
+      var tagName = $tag.text().slice(0, -1);
+      var tags = $input.val().split(',');
+      tags.splice(tags.indexOf(tagName), 1);
+      if (tags.length) {
+        tags = tags.join(',');
+      } else {
+        tags = '';
       }
+      $input.val(tags);
+      $tag.remove();
+    }
+
+    $el.on('selectResult', function (event) {
+      event.stopPropagation();
+      appendTag(makeTag(event.searchResult.name));
+      $searchBox.val('');
+    });
+
+    $tags.each(function () {
+      var $tag = $(this);
+      addRemoveBtn($tag);
 
       function selectTag(event) {
         event.preventDefault();
         console.log('select tag', $tag.find('a').first().text());
       }
 
-      var $removeBtn = $('<a class="removeTag">×</a>');
-      $tag.append($removeBtn);
-      $removeBtn.on('click', removeTag);
       $tag.find('a').first().on('click', selectTag);
-      $el.prepend($tag);
+      appendTag($tag);
     });
   }
 

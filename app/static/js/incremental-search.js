@@ -5,50 +5,53 @@ $(function () {
     var $searchBox = $(this);
     var searchUrl = $searchBox.data('search-url');
 
-    var $field = $('<input type="hidden" name="id">');
-    $field.insertAfter($searchBox);
-
     var $resultList = $('<ol class="incremental-search-results"/>');
     $resultList.insertAfter($searchBox);
+    $resultList.on('selectResult', function (event) {
+      $resultList.hide();
+      $searchBox.trigger(event);
+    });
+
+    $searchBox.on('keypress', delayedSearch);
 
     var delayTimer = null;
     var delay = 200;
 
-    $searchBox.on('keypress', function () {
-
+    function delayedSearch() {
       if (delayTimer) {
         clearTimeout(delayTimer);
       }
 
-      delayTimer = setTimeout(function () {
-        var term = $searchBox.val();
-        console.log(term);
-        search(searchUrl, term, showResults($resultList, option(highlight(term))));
-      }, delay);
-    });
+      delayTimer = setTimeout(search, delay);
+    }
 
-  }
+    function search() {
+      var term = $searchBox.val();
+      $.getJSON(searchUrl, {"q": term}, showResults(term));
+    }
 
-  function search(url, term, callback) {
-    $.getJSON(url, {"q": term}, callback);
-  }
+    function showResults(term) {
+      return function (data) {
+        $resultList.empty();
 
-  function showResults(resultList, widget) {
-    return function (data) {
+        if (data.results.length > 0) {
+          $resultList.show();
+          $resultList.append(data.results.map(option(highlight(term))));
 
-      resultList.empty();
-
-      for (var i in data.results) {
-        resultList.append(widget(data.results[i]));
-      }
-
-    };
+        } else {
+          $resultList.hide();
+        }
+      };
+    }
   }
 
   function option(format) {
     return function (result) {
       var widget = $('<li>' + format(result.name) + '</li>');
-      //widget.on('click', function () { submit(result.name, result.value); });
+      widget.on('click', function (event) {
+        event.stopPropagation();
+        widget.trigger($.Event('selectResult', {'searchResult': result}));
+      });
       return widget;
     };
   }

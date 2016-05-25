@@ -86,13 +86,16 @@ class WhenCreatingANote(object):
 
 class WhenUpdatingANote(object):
 
-    def it_adds_new_tags(self, before_update, after_update):
+    def it_adds_and_removes_tags(self, before_update, after_update):
         tags = before_update.find_all(class_='tag-list')
         tags = tags[0].find_all('li')
         assert len(tags) == 2
 
         tags = after_update.find(class_='tag-list').find_all('li')
-        assert len(tags) == 4
+        assert len(tags) == 3
+
+        names = [tag.text for tag in tags]
+        assert 'bar' not in names
 
 
 class WhenSearchingForATag(object):
