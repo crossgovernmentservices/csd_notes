@@ -95,7 +95,7 @@ class Note(db.Model, GetOr404Mixin, GetOrCreateMixin):
         db.session.commit()
 
     def add_tag(self, tag_name):
-        if not self.has_tag(tag_name):
+        if tag_name and not self.has_tag(tag_name):
             self.tags.append(Tag(name=sanitize(tag_name), author=self.author))
             db.session.add(self)
             db.session.commit()
@@ -188,9 +188,14 @@ class NoteHistory(db.Model):
 class Tag(db.Model, GetOr404Mixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    namespace = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship('User', backref='tags')
 
     @property
     def url(self):
         return url_for('notes.by_tag', tag=self.name)
+
+    @property
+    def usage_count(self):
+        return len(self.notes)
