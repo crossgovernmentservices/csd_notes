@@ -3,8 +3,8 @@
 Flask extensions instances, for access outside app.factory
 """
 
-from flask.ext.security import SQLAlchemyUserDatastore
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_security import SQLAlchemyUserDatastore
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection

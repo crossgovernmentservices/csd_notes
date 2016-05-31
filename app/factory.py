@@ -93,7 +93,7 @@ def register_extensions(app):
     # context
     db.app = app
 
-    from flask.ext.migrate import Migrate
+    from flask_migrate import Migrate
     from sqlalchemy.exc import ArgumentError
     migrate = Migrate()
     # XXX SQLite chokes on constraint changes without this
@@ -110,13 +110,13 @@ def register_extensions(app):
     from flaskext.markdown import Markdown
     Markdown(app, extensions=app.config.get('MARKDOWN_EXTENSIONS', []))
 
-    from flask.ext.humanize import Humanize
+    from flask_humanize import Humanize
     Humanize(app)
 
     from app.extensions import oidc
     oidc.init_app(app)
 
-    from flask.ext.security import Security
+    from flask_security import Security
     from app.extensions import user_datastore
     from app.blueprints.base.models import Role, User
     user_datastore.role_model = Role

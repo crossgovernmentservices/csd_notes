@@ -3,7 +3,7 @@
 Base models
 """
 
-from flask.ext.security import RoleMixin, UserMixin
+from flask_security import RoleMixin, UserMixin
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from app.extensions import db

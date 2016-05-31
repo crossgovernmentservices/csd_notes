@@ -5,7 +5,7 @@ Flask assets bundles and filters
 
 import os
 
-from flask.ext.assets import Bundle, Environment
+from flask_assets import Bundle, Environment
 
 from lib.jinja_to_js_filter import JinjaToJs
 from lib.sass_filter import LibSass

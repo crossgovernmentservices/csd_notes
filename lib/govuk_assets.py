@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 import urllib
 import zipfile
 
-from flask.ext.script import Command, Option
+from flask_script import Command, Option
 
 
 @contextlib.contextmanager

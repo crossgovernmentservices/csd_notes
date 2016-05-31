@@ -12,7 +12,7 @@ from flask import (
     request,
     url_for)
 from flask_login import current_user
-from flask.ext.security import login_required
+from flask_security import login_required
 from sqlalchemy import desc
 
 from app.blueprints.notes.email_tip import EmailTip

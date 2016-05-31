@@ -7,7 +7,7 @@ import datetime
 
 from bs4 import BeautifulSoup
 from flask import current_app, url_for
-from flask.ext.sqlalchemy import BaseQuery
+from flask_sqlalchemy import BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin, make_searchable
 from sqlalchemy_utils.types import TSVectorType
 

@@ -12,7 +12,7 @@ from flask import (
     session,
     url_for
 )
-from flask.ext.security.utils import login_user, logout_user
+from flask_security.utils import login_user, logout_user
 
 from app.extensions import (
     user_datastore,

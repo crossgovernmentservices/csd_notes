@@ -8,7 +8,7 @@ import mock
 from urllib.parse import parse_qs, urlparse
 
 from flask import url_for
-from flask.ext.login import current_user, logout_user
+from flask_login import current_user, logout_user
 import pytest
 
 from app.blueprints.base.models import User
