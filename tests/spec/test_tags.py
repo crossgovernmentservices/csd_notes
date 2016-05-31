@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 import pytest
 
-from app.blueprints.notes.models import Note
+from app.blueprints.notes.models import Note, Tag
 
 
 @pytest.fixture
@@ -44,9 +44,21 @@ def after_update(client, logged_in, tagged_note):
     return BeautifulSoup(html, 'html.parser')
 
 
+@pytest.fixture
+def tags(db_session, test_user):
+
+    def make_tag(name):
+        tag = Tag(name=name, author=test_user)
+        db_session.add(tag)
+        db_session.commit()
+        return tag
+
+    return list(map(make_tag, ['foo', 'foobar', 'bar', 'baz', 'quux']))
+
+
 class WhenViewingANote(object):
 
-    def it_has_a_list_of_tags(self, tagged_note):
+    def it_has_a_list_of_tags(self, logged_in, tagged_note):
         assert len(tagged_note.tags) == 2
         assert tagged_note.has_tag('foo')
         assert tagged_note.has_tag('bar')
@@ -74,10 +86,13 @@ class WhenCreatingANote(object):
 
 class WhenUpdatingANote(object):
 
-    def it_adds_new_tags(self, before_update, after_update):
+    def it_adds_and_removes_tags(self, before_update, after_update):
         tags = before_update.find_all(class_='tag-list')
         tags = tags[0].find_all('li')
         assert len(tags) == 2
 
         tags = after_update.find(class_='tag-list').find_all('li')
-        assert len(tags) == 4
+        assert len(tags) == 3
+
+        names = [tag.text for tag in tags]
+        assert 'bar' not in names

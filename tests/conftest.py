@@ -1,5 +1,6 @@
 import subprocess
 
+from flask_migrate import upgrade
 import pytest
 import sqlalchemy
 
@@ -24,16 +25,38 @@ def app(request):
     ctx.pop()
 
 
+def reset_migrations(db):
+
+    # reset migrations, otherwise they will not be reapplied
+    conn = db.engine.connect()
+
+    try:
+        conn.execute('DELETE FROM alembic_version')
+
+    except sqlalchemy.exc.ProgrammingError:
+        pass
+
+    finally:
+        conn.close()
+
+
+def teardown_db(db):
+    db.drop_all()
+    reset_migrations(db)
+
+
 def init_db(dbname, db):
     sqlalchemy.orm.configure_mappers()
 
     try:
-        db.create_all()
+        teardown_db(db)
 
     except sqlalchemy.exc.OperationalError as e:
         if 'does not exist' in str(e):
             create_db(dbname)
-            init_db(db)
+            init_db(dbname, db)
+
+    upgrade()
 
 
 def create_db(dbname):
@@ -45,12 +68,11 @@ def db(request, app):
     _db.app = app
     _, dbname = TEST_DATABASE_URI.rsplit('/', 1)
 
-    _db.drop_all()
     init_db(dbname, _db)
 
     yield _db
 
-    _db.drop_all()
+    teardown_db(_db)
 
 
 @pytest.yield_fixture(scope='function')

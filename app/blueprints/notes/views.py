@@ -90,9 +90,16 @@ def edit(id):
 
     note.update(request.form['content'])
 
-    tags = request.form.get('tags', '').split(',')
-    for tag in tags:
-        note.add_tag(tag.strip())
+    existing_tags = set([tag.name for tag in note.tags])
+
+    submitted_tags = set(
+        [tag.strip() for tag in request.form.get('tags', '').split(',')])
+
+    for tag in (submitted_tags - existing_tags):
+        note.add_tag(tag)
+
+    for tag in (existing_tags - submitted_tags):
+        note.remove_tag(tag)
 
     return redirect(url_for('.list'))
 
@@ -101,7 +108,7 @@ def edit(id):
 @login_required
 def search_json():
     term = request.args.get('q')
-    notes = Note.search(term).all()
+    notes = Note.search(term, current_user).all()
     return jsonify({'results': [note.json for note in notes]})
 
 
@@ -109,7 +116,7 @@ def search_json():
 @login_required
 def search():
     term = escape(request.args.get('q'))
-    results = Note.search(term)
+    results = Note.search(term, current_user)
     ctx = {
         'notes': results.all(),
         'search_term': term,
