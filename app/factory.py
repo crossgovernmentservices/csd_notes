@@ -30,7 +30,8 @@ def register_error_handlers(app):
 
     error_handlers = {
         '404.html': [404],
-        '4xx.html': [401, 402, 405, 406, 407, 408, 409],
+        # avoid flask 0.11 bug with 402 and 407
+        '4xx.html': [401, 405, 406, 408, 409],
         '5xx.html': [500, 501, 502, 503, 504, 505]}
 
     def make_handler(code, template):

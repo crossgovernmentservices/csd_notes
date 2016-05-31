@@ -3,7 +3,7 @@ bs4
 credstash
 cryptography
 flask
-git+http://github.com/miracle2k/flask-assets.git#egg=flask-assets
+git+https://github.com/andyhd/flask-assets.git@f479d0f9b663d75bf887f4a1498e590d0b365970#egg=flask-assets
 flask-humanize
 flask-mail
 flask-markdown
