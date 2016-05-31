@@ -13,7 +13,7 @@ from flask import (
     url_for)
 from flask_login import current_user
 from flask_security import login_required
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from app.blueprints.notes.email_tip import EmailTip
 from app.blueprints.notes.models import Note, Tag
@@ -32,6 +32,22 @@ def list():
     email_tip.incr_times_seen()
 
     return render_template('notes/list.html', notes=notes)
+
+
+@notes.route('/tags')
+@login_required
+def tags():
+    tags = Tag.query.filter(or_(
+        Tag.author == current_user,
+        Tag.author == None))  # noqa
+
+    context = {
+        'user_tags': tags.filter(Tag.namespace == None).all(),  # noqa
+        'competency_tags': tags.filter(Tag.namespace == 'Competency').all(),
+        'objective_tags': tags.filter(Tag.namespace == 'Objective').all(),
+    }
+
+    return render_template('notes/tags.html', **context)
 
 
 @notes.route('/notes/tag/<tag>')

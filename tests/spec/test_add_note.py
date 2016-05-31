@@ -19,7 +19,7 @@ def soup(follow_redirect):
     return BeautifulSoup(follow_redirect.get_data(as_text=True), 'html.parser')
 
 
-@pytest.mark.use_fixtures('db_session', 'logged_in')
+@pytest.mark.usefixtures('db_session', 'logged_in')
 class WhenAddingANewNote(object):
 
     def it_redirects_to_the_list_view(self, form_submit):

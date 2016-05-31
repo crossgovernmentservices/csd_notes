@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block endhead %}
+  {% assets "css_notes" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+{% endblock %}
+
+{% macro tag_list(title, tags, add_tag_form=False) %}
+  <div>
+
+    <h2 class="heading-medium">{{ title }}</h2>
+
+    <ul class="tag-list-block">
+    {% for tag in tags %}
+      <li class="note-tag{% if tag.usage_count %} note-tag--count{% endif %}">
+        <a href="{{ tag.url }}">{{ tag.name }}</a>
+        {% if tag.usage_count %}
+          <span class="tag-quantity">{{ tag.usage_count }}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+
+    {% if add_tag_form %}
+    <details class="section">
+      <summary>Create new tags</summary>
+    </details>
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% block body_content %}
+
+  <div class="test">
+    <a href="{{ url_for('notes.list') }}" class="link-back">Back to all notes</a>
+
+    <h1 class="heading-large">
+      Manage your tags
+    </h1>
+    <p class="lede">
+      Use this page to manage the tags you use to organise your notes
+    </p>
+  </div>
+
+  <section class="notes-section">
+
+    {{ tag_list("Your tags", user_tags, add_tag_form=True) }}
+
+    {{ tag_list("Default tags", competency_tags) }}
+
+  </section>
+
+{% endblock %}
