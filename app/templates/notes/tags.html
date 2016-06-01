@@ -6,10 +6,15 @@
   {% endassets %}
 {% endblock %}
 
-{% macro tag_list(title, tags, add_tag_form=False) %}
-  <div>
+{% macro tag_list(title, tags, edit=False, ns=None) %}
+  <section class="tag-type-section">
 
-    <h2 class="heading-medium">{{ title }}</h2>
+    <h2 class="heading-medium tag-type-title">
+      {{ title }}
+      {% if edit -%}
+        <a class="edit-link">Edit</a>
+      {%- endif %}
+    </h2>
 
     <ul class="tag-list-block">
     {% for tag in tags %}
@@ -22,13 +27,23 @@
     {% endfor %}
     </ul>
 
-    {% if add_tag_form %}
-    <details class="section">
-      <summary>Create new tags</summary>
-    </details>
+    {% if edit %}
+    <section class="tag-list-edit">
+      <label class="form-label">Edit your tags</label>
+      {% for tag in tags %}
+      <form action="{{ url_for('notes.tags') }}" method="post" class="form tag-edit">
+        <div class="tag-entry-group">
+          <input type="hidden" name="namespace" value="{{ tag.namespace }}">
+          <input type="text" name="name" value="{{ tag.name }}" data-initial="{{ tag.name }}" class="form-control tag-entry-field">
+          <button class="button save-btn">Save</button>
+          <button class="button secondary-btn">Delete</button>
+        </div>
+      </form>
+      {% endfor %}
+    </section>
     {% endif %}
 
-  </div>
+  </section>
 {% endmacro %}
 
 {% block body_content %}
@@ -46,9 +61,13 @@
 
   <section class="notes-section">
 
-    {{ tag_list("Your tags", user_tags, add_tag_form=True) }}
+    {{ tag_list("Your tags", user_tags, edit=True) }}
 
-    {{ tag_list("Default tags", competency_tags) }}
+    {{ tag_list("Objective tags", objective_tags, edit=True, ns="Objective") }}
+
+    {{ tag_list("Competency tags", competency_tags) }}
+
+    {{ tag_list("System tags", system_tags) }}
 
   </section>
 

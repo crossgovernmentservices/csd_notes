@@ -45,6 +45,7 @@ def tags():
         'user_tags': tags.filter(Tag.namespace == None).all(),  # noqa
         'competency_tags': tags.filter(Tag.namespace == 'Competency').all(),
         'objective_tags': tags.filter(Tag.namespace == 'Objective').all(),
+        'system_tags': tags.filter(Tag.namespace == 'System').all()
     }
 
     return render_template('notes/tags.html', **context)

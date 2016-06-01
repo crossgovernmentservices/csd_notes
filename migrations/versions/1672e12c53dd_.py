@@ -44,7 +44,6 @@ def upgrade():
 
     # add competency tags
     for name in competency_names:
-        print('inserting {} tag'.format(name))
         op.execute(tag.insert().values(namespace='Competency', name=name))
 
 
