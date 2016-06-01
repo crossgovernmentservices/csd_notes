@@ -53,10 +53,11 @@ def tags():
 @notes.route('/notes/tag/<tag>')
 @login_required
 def by_tag(tag):
-    tag = Tag.get_or_404(author=current_user, name=tag)
-    notes = tag.notes.order_by(desc(Note.updated)).all()
 
-    return render_template('notes/list.html', notes=notes)
+    notes = Note.query.filter(Note.tags.any(name=tag)).order_by(
+        desc(Note.updated)).all()
+
+    return render_template('notes/by_tag.html', tag=tag, notes=notes)
 
 
 @notes.route('/notes', methods=['POST'])

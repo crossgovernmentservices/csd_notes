@@ -1,0 +1,43 @@
+{% extends "notes/list.html" %}
+
+{% block body_content %}
+
+  <div class="test">
+    <a href="{{ url_for('notes.list') }}" class="link-back">Back to all notes</a>
+
+    <h1 class="heading-xlarge">
+      <span class="heading-secondary">Tag:</span>
+      {{ tag }}
+    </h1>
+
+  </div>
+
+  {#
+  <section class="notes-section alias-section">
+    <dl class="definition-inline alias-list">
+      
+    </dl>
+    <details>
+      <summary class="help-link">What are tag aliases?</summary>
+    </details>
+  </section>
+  #}
+
+  <section class="notes-main">
+  {% if notes|length %}
+    <p class="result-info">
+      <span class="result-count">{{ notes|length }}</span>
+      note{% if notes|length > 1 %}s{% endif %} tagged with these tags
+    </p>
+  {% else %}
+    <p class="empty-state-large">0 notes found</p>
+  {% endif %}
+  </section>
+
+  {% include "partial/notes_list.html" %}
+
+  <div class="test">
+    <a class="more-link" href="">load more</a>
+  </div>
+
+{% endblock %}
