@@ -83,6 +83,18 @@
   margin-top: -13px;
 }
 
+.empty-state {
+  color: $border-colour;
+}
+
+.empty-state-large {
+  @extend .empty-state;
+  font-weight: bold;
+  font-size: 80px;
+  color: $panel-colour;
+  text-align: center;
+}
+
 // Notes
 // ==========================================================================
 .note {
