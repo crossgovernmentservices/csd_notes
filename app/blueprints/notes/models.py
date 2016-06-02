@@ -23,10 +23,13 @@ class NoteQuery(BaseQuery, SearchQueryMixin):
 
 
 def sanitize(content):
-    soup = BeautifulSoup(content, 'html.parser')
-    nodes = soup.recursiveChildGenerator()
-    text_nodes = [e for e in nodes if isinstance(e, str)]
-    return ''.join(text_nodes)
+    if content:
+        soup = BeautifulSoup(content, 'html.parser')
+        nodes = soup.recursiveChildGenerator()
+        text_nodes = [e for e in nodes if isinstance(e, str)]
+        content = ''.join(text_nodes)
+
+    return content
 
 
 tags = db.Table(
@@ -199,3 +202,19 @@ class Tag(db.Model, GetOr404Mixin):
     @property
     def usage_count(self):
         return len(self.notes)
+
+    @classmethod
+    def create(cls, name, namespace, author):
+        tag = Tag(
+            name=sanitize(name),
+            namespace=sanitize(namespace),
+            author=author)
+        db.session.add(tag)
+        db.session.commit()
+        return tag
+
+    def update(self, name, **kwargs):
+        self.name = sanitize(name)
+        self.namespace = sanitize(kwargs.get('namespace'))
+        db.session.add(self)
+        db.session.commit()

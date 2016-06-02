@@ -5,6 +5,7 @@ Notes views
 
 from flask import (
     Blueprint,
+    abort,
     escape,
     jsonify,
     redirect,
@@ -14,6 +15,7 @@ from flask import (
 from flask_login import current_user
 from flask_security import login_required
 from sqlalchemy import desc, or_
+from sqlalchemy.orm.exc import NoResultFound
 
 from app.blueprints.notes.email_tip import EmailTip
 from app.blueprints.notes.models import Note, Tag
@@ -34,12 +36,25 @@ def list():
     return render_template('notes/list.html', notes=notes)
 
 
-@notes.route('/tags')
+@notes.route('/tags', methods=['GET', 'POST'])
 @login_required
 def tags():
     tags = Tag.query.filter(or_(
         Tag.author == current_user,
         Tag.author == None))  # noqa
+
+    if request.method == 'POST':
+        try:
+            tag = tags.filter(Tag.id == int(request.form['id'])).one()
+
+        except NoResultFound:
+            abort(404)
+
+        tag.update(
+            name=request.form['name'],
+            namespace=request.form.get('namespace'))
+
+        return redirect(url_for('.tags'))
 
     context = {
         'user_tags': tags.filter(Tag.namespace == None).all(),  # noqa

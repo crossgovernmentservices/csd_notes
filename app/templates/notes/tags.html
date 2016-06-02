@@ -33,7 +33,8 @@
       {% for tag in tags %}
       <form action="{{ url_for('notes.tags') }}" method="post" class="form tag-edit">
         <div class="tag-entry-group">
-          <input type="hidden" name="namespace" value="{{ tag.namespace }}">
+          <input type="hidden" name="id" value="{{ tag.id }}">
+          {% if ns %}<input type="hidden" name="namespace" value="{{ tag.namespace }}">{% endif %}
           <input type="text" name="name" value="{{ tag.name }}" data-initial="{{ tag.name }}" class="form-control tag-entry-field">
           <button class="button save-btn">Save</button>
           <button class="button secondary-btn">Delete</button>
@@ -41,6 +42,16 @@
       </form>
       {% endfor %}
     </section>
+    {% endif %}
+
+    {% if ns == "Competency" %}
+    <details>
+      <summary class="help-text">Why can't I edit these tags?</summary>
+    </details>
+    {% elif ns == "System" %}
+    <details>
+      <summary class="help-text">How are these generated?</summary>
+    </details>
     {% endif %}
 
   </section>
@@ -65,9 +76,9 @@
 
     {{ tag_list("Objective tags", objective_tags, edit=True, ns="Objective") }}
 
-    {{ tag_list("Competency tags", competency_tags) }}
+    {{ tag_list("Competency tags", competency_tags, ns="Competency") }}
 
-    {{ tag_list("System tags", system_tags) }}
+    {{ tag_list("System tags", system_tags, ns="System") }}
 
   </section>
 
