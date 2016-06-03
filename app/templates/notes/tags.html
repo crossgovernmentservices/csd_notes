@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% macro tag_list(title, tags, edit=False, ns=None) %}
-  <section class="tag-type-section">
+  <section class="tag-type-section{% if edit %} editable{% endif %}">
 
     <h2 class="heading-medium tag-type-title">
       {{ title }}
       {% if edit -%}
-        <a class="edit-link">Edit</a>
+        <a href="#" class="edit-link">Edit</a>
       {%- endif %}
     </h2>
 
@@ -30,17 +30,17 @@
     {% if edit %}
     <section class="tag-list-edit">
       <label class="form-label">Edit your tags</label>
-      {% for tag in tags %}
       <form action="{{ url_for('notes.tags') }}" method="post" class="form tag-edit">
+      {% for tag in tags %}
         <div class="tag-entry-group">
-          <input type="hidden" name="id" value="{{ tag.id }}">
-          {% if ns %}<input type="hidden" name="namespace" value="{{ tag.namespace }}">{% endif %}
-          <input type="text" name="name" value="{{ tag.name }}" data-initial="{{ tag.name }}" class="form-control tag-entry-field">
-          <button class="button save-btn">Save</button>
-          <button class="button secondary-btn">Delete</button>
+          <input type="hidden" name="tag-{{ loop.index0 }}-id" value="{{ tag.id }}">
+          {% if ns %}<input type="hidden" name="tag-{{ loop.index0 }}-namespace" value="{{ tag.namespace }}">{% endif %}
+          <input type="text" name="tag-{{ loop.index0 }}-name" value="{{ tag.name }}" class="form-control tag-entry-field">
         </div>
-      </form>
       {% endfor %}
+        <button class="save button">Save</button>
+        <button class="secondary button">Cancel</button>
+      </form>
     </section>
     {% endif %}
 
@@ -81,5 +81,13 @@
     {{ tag_list("System tags", system_tags, ns="System") }}
 
   </section>
+
+{% endblock %}
+
+{% block body_end %}
+
+  {% assets "js_notes" %}
+    <script src="{{ ASSET_URL }}"></script>
+  {% endassets %}
 
 {% endblock %}

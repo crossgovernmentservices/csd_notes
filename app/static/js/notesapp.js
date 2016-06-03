@@ -69,6 +69,42 @@
     $input.on('blur', cancel);
   }
 
+  function setEditMode(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    $('.edit-mode').removeClass('edit-mode');
+    $(this).closest('.editable').addClass('edit-mode');
+  }
+
+  function enhanceTagForm() {
+    var $section = $(this);
+    var $base_form = $section.find('form');
+    $base_form.find('button').remove();
+
+    $section.find('.tag-entry-group').each(function () {
+      var $tag = $(this);
+      var $form = $('<form method="post">').attr('action', $base_form.attr('action'));
+      $tag.wrap($form);
+      $tag.find('input').each(function () {
+        var $input = $(this);
+        $input.attr('name', $input.attr('name').replace(/tag-\d+-(.*)/, 'tag-0-$1'));
+      });
+      $tag.append($('<button class="save-btn button">Save</button>'));
+      $tag.append($('<button class="secondary-btn button">Delete</button>'));
+
+      $tag.find('input[type=text]').on('input keypress', function () {
+        var $input = $(this);
+        if ($input.val() != $input.data('initial')) {
+          $tag.addClass('changed');
+        } else {
+          $tag.removeClass('changed');
+        }
+      });
+    });
+
+  }
+
   $(function() {
     $('.editOnClick').each(editOnClick);
 
@@ -83,6 +119,10 @@
     $('.undo-link').on('click', function (event) {
       event.stopPropagation();
     });
+
+    $('.edit-link').on('click', setEditMode);
+
+    $('.tag-list-edit').each(enhanceTagForm);
 
     $('.editable.search-term').each(editableSearchTerm);
   });

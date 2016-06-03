@@ -2,7 +2,7 @@
 
 {% block head %}
 
-  {% assets "css_govuk_elements", "css_main" %}
+  {% assets "css_govuk_elements", "css_main", "css_notes" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {% endassets %}
 
@@ -12,17 +12,33 @@
 
 {% endblock %}
 
+{% block body_classes %}full-width{% endblock %}
+
 {% block content %}
+  <div class="full-width-container">
+    {% block top_banner %}
+    <div class="grid-row">
+      <div class="column-two-thirds">
+        <h1>Keep notes on my performance</h1>
+      </div>
+      <div class="column-third">
+        {% if current_user.is_authenticated %}
+        <form method="get" action="{{ url_for('notes.search') }}">
+          <fieldset class="main-search search--dark">
+            <input type="search" name="q" class="search__input" placeholder="Search your notes">
+            <button class="search__submit">Search</button>
+          </fieldset>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endblock %}
+  </div>
+
   <main id="wrapper" role="main">
     <div id="content">
-      <div class="inner-block">
-        <div class="phase-banner-alpha">
-          <p>
-            <strong class="phase-tag">ALPHA</strong>
-            <span>This is a prototype service</span>
-          </p>
-        </div>
-      </div>
+
+      {% include "_messages.html" %}
 
       {% include "partial/login_state.html" %}
 

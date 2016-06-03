@@ -6,14 +6,6 @@
   {% endassets %}
 {% endblock %}
 
-{% block inside_header %}
-  <form class="search" method="get" action="{{ url_for('notes.search') }}">
-    <fieldset>
-      <input type="search" name="q" placeholder="Search"><button>Search</button>
-    </fieldset>
-  </form>
-{% endblock %}
-
 {% block body_content %}
 
   <div class="test">

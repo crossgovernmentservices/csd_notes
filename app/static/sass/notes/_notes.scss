@@ -1,6 +1,33 @@
 // Global stuff
 // ==========================================================================
 
+// Full width blue header
+.full-width-container {
+  background: $govuk-blue;
+  padding: 45px 0;
+  margin-bottom: 45px;
+  max-width: 100%;
+
+  .grid-row {
+    max-width: $site-width + $gutter;
+    margin: auto;
+  }
+
+  h1 {
+    color: $page-colour;
+    font-size: 36px;
+    font-weight: bold;
+    line-height: 40px;
+  }
+}
+
+.full-width {
+  // Hide standard blue strip
+  #global-header-bar {
+    display: none;
+  }
+}
+
 .sign-out {
   text-align: right;
   margin: 10px 0;
@@ -351,6 +378,14 @@
   top: -1px;
   font-size: 16px;
   line-height: 1em;
+}
+
+.secondary-btn {
+  background: $grey-3;
+  border: none;
+  color: $black;
+  box-shadow: 0 2px 0 $grey-2;
+  -webkit-font-smoothing: antialiased;
 }
 
 .js-enabled {

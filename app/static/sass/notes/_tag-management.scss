@@ -3,14 +3,20 @@
 .tag-type-section {
   margin-bottom: 2*$gutter;
   .edit-link {
+    display: none;
     position: absolute;
     right: 0;
     font-size: 19px;
     line-height: 30px;
   }
-  &.edit-mode .edit-link {
-    display: none;
-  }
+}
+
+.js-enabled .edit-mode .edit-link {
+  display: none;
+}
+
+.js-enabled .edit-link {
+  display: inline;
 }
 
 .tag-type-title {
@@ -38,12 +44,16 @@
   .form-control {
     padding: 6px 8px 2px;
   }
+  .save-btn {
+    display: inline-block;
+  }
 }
 
-.tag-entry-group {
+.js-enabled .tag-entry-group {
   .save-btn {
     display: none;
   }
+
   &.changed {
     .save-btn {
       display: inline-block;
@@ -58,13 +68,20 @@
   }
 }
 
-.edit-mode .tag-list-block {
+.tag-list-block,
+.js-enabled .edit-mode .tag-list-block {
   display: none;
-}
-.tag-list-edit {
-  display: none;
-  .edit-mode & {
-    display: block;
-  }
 }
 
+.js-enabled .tag-list-block {
+  display: block;
+}
+
+.tag-list-edit,
+.js-enabled .edit-mode .tag-list-edit {
+  display: block;
+}
+
+.js-enabled .tag-list-edit {
+  display: none;
+}

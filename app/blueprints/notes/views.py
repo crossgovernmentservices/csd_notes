@@ -5,7 +5,6 @@ Notes views
 
 from flask import (
     Blueprint,
-    abort,
     escape,
     jsonify,
     redirect,
@@ -14,8 +13,7 @@ from flask import (
     url_for)
 from flask_login import current_user
 from flask_security import login_required
-from sqlalchemy import desc, or_
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import desc, func, or_
 
 from app.blueprints.notes.email_tip import EmailTip
 from app.blueprints.notes.models import Note, Tag
@@ -36,23 +34,30 @@ def list():
     return render_template('notes/list.html', notes=notes)
 
 
+def submitted_tags():
+    tag_data = {}
+    for key, value in sorted(request.form.items()):
+        if key.startswith('tag-'):
+            index = int(''.join(x for x in key if x.isdigit()))
+            _, _, key = key.rpartition('-')
+            tag_data.setdefault(index, {})[key] = value
+
+    return tag_data.values()
+
+
 @notes.route('/tags', methods=['GET', 'POST'])
 @login_required
 def tags():
     tags = Tag.query.filter(or_(
         Tag.author == current_user,
-        Tag.author == None))  # noqa
+        Tag.author == None)).order_by(  # noqa
+            func.lower(Tag.name))
 
     if request.method == 'POST':
-        try:
-            tag = tags.filter(Tag.id == int(request.form['id'])).one()
 
-        except NoResultFound:
-            abort(404)
-
-        tag.update(
-            name=request.form['name'],
-            namespace=request.form.get('namespace'))
+        for data in submitted_tags():
+            tag = Tag.query.get(data['id'])
+            tag.update(**data)
 
         return redirect(url_for('.tags'))
 
